@@ -1,0 +1,12 @@
+*.class
+bin/
+*.ipr
+*.iws
+*.iml
+*.project
+*.classpath
+/.idea/
+/target/
+/target/
+/TNE/target/
+fiotnh33.xot.txt
