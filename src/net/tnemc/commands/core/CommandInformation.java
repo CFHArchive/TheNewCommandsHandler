@@ -4,10 +4,12 @@ import net.tnemc.commands.core.parameter.CommandParameter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Optional;
+import java.util.TreeMap;
 
 /**
  * The New Economy Minecraft Server Plugin
@@ -21,7 +23,8 @@ import java.util.Optional;
  */
 public class CommandInformation {
 
-  private LinkedHashMap<String, CommandParameter> parameters = new LinkedHashMap<>();
+  private NavigableMap<Integer, CommandParameter> parameters = new TreeMap<>();
+
 
   private Map<List<String>, CommandInformation> sub = new HashMap<>();
 
@@ -89,18 +92,21 @@ public class CommandInformation {
   }
 
   public void addParameter(CommandParameter parameter) {
-    parameters.put(parameter.getName(), parameter);
+    if(parameter.getOrder() == -1) {
+      parameter.setOrder(parameters.lastKey() + 1);
+    }
+    parameters.put(parameter.getOrder(), parameter);
   }
 
   public void removeParameter(String name) {
     parameters.remove(name);
   }
 
-  public Map<String, CommandParameter> getParameter() {
+  public NavigableMap<Integer, CommandParameter> getParameters() {
     return parameters;
   }
 
-  public void setParameter(LinkedHashMap<String, CommandParameter> parameters) {
+  public void setParameters(NavigableMap<Integer, CommandParameter> parameters) {
     this.parameters = parameters;
   }
 
@@ -109,14 +115,6 @@ public class CommandInformation {
     identifiers.add(name);
     identifiers.addAll(aliases);
     return identifiers;
-  }
-
-  public Map<String, CommandParameter> getParameters() {
-    return parameters;
-  }
-
-  public void setParameters(LinkedHashMap<String, CommandParameter> parameters) {
-    this.parameters = parameters;
   }
 
   public Map<List<String>, CommandInformation> getSub() {
@@ -205,5 +203,12 @@ public class CommandInformation {
 
   public void setDeveloper(boolean developer) {
     this.developer = developer;
+  }
+
+  public void addParameters(LinkedList<CommandParameter> parameters) {
+
+    for(CommandParameter param : parameters)  {
+      addParameter(param);
+    }
   }
 }

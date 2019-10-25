@@ -22,6 +22,22 @@ Commands:
 
       Message:
 
+        #The order this param is in the arguments array.
+        Order: 0
+
+        Validation:
+
+          #Valid Types: int, integer, String, Double, BigDecimal, int, boolean
+          Type: "int"
+
+          MaxLength: 0
+
+          Regex:
+
+            Use: false
+
+            Statement: ""
+
         Optional: true
 
         Complete: true

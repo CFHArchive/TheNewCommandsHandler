@@ -96,6 +96,10 @@ public class CommandManager {
     }
   }
 
+  public void registerExecutor(String name, CommandExecution executor) {
+    executors.put(name, executor);
+  }
+
   public void unregister(String[] accessors) {
     unregister(accessors, false);
   }

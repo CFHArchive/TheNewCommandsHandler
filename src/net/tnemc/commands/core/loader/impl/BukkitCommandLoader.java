@@ -44,7 +44,7 @@ public class BukkitCommandLoader implements CommandLoader {
     CommandInformation commandInfo = new CommandInformation(name);
 
     commandInfo.setAliases(config.getStringList(base + ".Alias"));
-    commandInfo.setAuthor(config.getString(base + ".Author", "creatorfromhell"));
+    commandInfo.setAuthor(config.getString(base + ".Author", "Magic"));
     commandInfo.setPermission(config.getString(base + ".Permission", ""));
     commandInfo.setConsole(config.getBoolean(base + ".Console", true));
     commandInfo.setDeveloper(config.getBoolean(base + ".Developer", false));

@@ -12,13 +12,27 @@ package net.tnemc.commands.core.parameter;
  */
 public class CommandParameter {
 
+  private int order = -1;
   private String name;
-  private boolean optional;
-  private boolean tabComplete;
-  private String completeType;
+  private boolean optional = true;
+
+  //Validation variables.
+  private String type = "string";
+  private int maxLength = 0;
+  private boolean useRegex = false;
+  private String regex = "";
+
+  //Tab completion variables.
+  private boolean tabComplete = false;
+  private String completeType = "unknown";
 
   public CommandParameter(String name) {
     this.name = name;
+  }
+
+  public CommandParameter(int order, String name) {
+    this.name = name;
+    this.order = order;
   }
 
   public CommandParameter(String name, boolean optional, boolean tabComplete, String completeType) {
@@ -26,6 +40,22 @@ public class CommandParameter {
     this.optional = optional;
     this.tabComplete = tabComplete;
     this.completeType = completeType;
+  }
+
+  public CommandParameter(int order, String name, boolean optional, boolean tabComplete, String completeType) {
+    this.name = name;
+    this.order = order;
+    this.optional = optional;
+    this.tabComplete = tabComplete;
+    this.completeType = completeType;
+  }
+
+  public int getOrder() {
+    return order;
+  }
+
+  public void setOrder(int order) {
+    this.order = order;
   }
 
   public String getName() {
@@ -42,6 +72,38 @@ public class CommandParameter {
 
   public void setOptional(boolean optional) {
     this.optional = optional;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public int getMaxLength() {
+    return maxLength;
+  }
+
+  public void setMaxLength(int maxLength) {
+    this.maxLength = maxLength;
+  }
+
+  public boolean isUseRegex() {
+    return useRegex;
+  }
+
+  public void setUseRegex(boolean useRegex) {
+    this.useRegex = useRegex;
+  }
+
+  public String getRegex() {
+    return regex;
+  }
+
+  public void setRegex(String regex) {
+    this.regex = regex;
   }
 
   public boolean isTabComplete() {

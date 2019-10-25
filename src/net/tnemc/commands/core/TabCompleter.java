@@ -1,6 +1,5 @@
 package net.tnemc.commands.core;
 
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.util.LinkedList;
@@ -17,5 +16,5 @@ import java.util.LinkedList;
  */
 @FunctionalInterface
 public interface TabCompleter {
-  LinkedList<String> complete(CommandSender sender, Command command, String alias, String[] arguments, boolean shortened);
+  LinkedList<String> complete(CommandSender sender, String argument);
 }
