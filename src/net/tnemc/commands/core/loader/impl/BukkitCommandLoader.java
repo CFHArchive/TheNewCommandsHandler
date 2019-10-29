@@ -2,11 +2,13 @@ package net.tnemc.commands.core.loader.impl;
 
 import net.tnemc.commands.core.CommandInformation;
 import net.tnemc.commands.core.CommandsHandler;
-import net.tnemc.commands.core.TabCompleter;
+import net.tnemc.commands.core.completer.ConfigCompleter;
 import net.tnemc.commands.core.loader.CommandLoader;
 import net.tnemc.commands.core.parameter.CommandParameter;
+import net.tnemc.commands.core.parameter.ParameterType;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.LinkedList;
 import java.util.Set;
 
 public class BukkitCommandLoader implements CommandLoader {
@@ -25,7 +27,7 @@ public class BukkitCommandLoader implements CommandLoader {
 
       final CommandInformation info = loadCommand(command, base);
 
-      CommandsHandler.manager().register(info.getAliases(), info);
+      CommandsHandler.manager().register(info.getIdentifiers(), info);
     }
   }
 
@@ -35,8 +37,11 @@ public class BukkitCommandLoader implements CommandLoader {
     for(String completer : completers) {
       final String base = "Completion." + completer;
 
-      final TabCompleter completerInstance = loadCompleter(completer, base);
-      CommandsHandler.manager().getCompleters().put(completer, completerInstance);
+      CommandsHandler.manager().getCompleters().put(completer, new ConfigCompleter(
+          new LinkedList<>(config.getStringList(base + ".Values")),
+          completer,
+          config.getInt(base + ".Limit", 5)
+      ));
     }
   }
 
@@ -55,20 +60,7 @@ public class BukkitCommandLoader implements CommandLoader {
       commandInfo.setSubShort(config.getStringList(base + ".Short"));
     }
 
-    final Set<String> params = config.getConfigurationSection(base + ".Params").getKeys(false);
-
-    for(String parameter : params) {
-
-      final String paramBase = base + ".Params." + parameter;
-      CommandParameter param = new CommandParameter(parameter);
-
-      param.setOptional(config.getBoolean(paramBase + ".Optional", true));
-      param.setTabComplete(config.getBoolean(paramBase + ".Complete", false));
-      param.setCompleteType(config.getString(paramBase + ".CompleteType", "Player"));
-
-      commandInfo.addParameter(param);
-
-    }
+    commandInfo.addParameters(loadParameters(name, base));
 
     final Set<String> sub = config.getConfigurationSection(base + ".Sub").getKeys(false);
 
@@ -78,7 +70,35 @@ public class BukkitCommandLoader implements CommandLoader {
     return commandInfo;
   }
 
-  public TabCompleter loadCompleter(String name, String base) {
-    return null;
+  @Override
+  public LinkedList<CommandParameter> loadParameters(String command, String configBase) {
+    LinkedList<CommandParameter> parameters = new LinkedList<>();
+
+    final Set<String> params = config.getConfigurationSection(configBase + ".Params").getKeys(false);
+
+    for(String parameter : params) {
+
+      final String paramBase = configBase + ".Params." + parameter;
+      CommandParameter param = new CommandParameter(parameter.toLowerCase());
+
+      param.setOrder(config.getInt(paramBase + ".Order", -1));
+
+      //Validation-related variables
+      final String type = config.getString(paramBase + ".Validation.Type", "string");
+      if(ParameterType.exists(type)) param.setType(type);
+
+      param.setMaxLength(config.getInt(paramBase + ".Validation.MaxLength", 0));
+      param.setUseRegex(config.getBoolean(paramBase + ".Validation.Regex.Use", false));
+      param.setRegex(config.getString(paramBase + ".Validation.Regex.Statement", ""));
+
+
+      //Our core param variables
+      param.setOptional(config.getBoolean(paramBase + ".Optional", true));
+      param.setTabComplete(config.getBoolean(paramBase + ".Complete", false));
+      param.setCompleteType(config.getString(paramBase + ".CompleteType", "Player"));
+
+      parameters.add(param);
+    }
+    return parameters;
   }
 }

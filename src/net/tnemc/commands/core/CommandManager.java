@@ -129,7 +129,7 @@ public class CommandManager {
       if(pluginCommand != null) {
         ((SimpleCommandMap) commandMap.get(Bukkit.getServer())).register(command, pluginCommand);
       }
-    } catch(Exception e) {
+    } catch(Exception ignore) {
       //nothing to see here;
     }
   }
@@ -154,7 +154,7 @@ public class CommandManager {
       }
       ((Map<String, Command>) knownCommands.get(commandMap.get(Bukkit.getServer()))).remove(command);
       knownCommands.set(commandMap.get(Bukkit.getServer()), knownCommands);
-    } catch(Exception e) {
+    } catch(Exception ignore) {
       //nothing to see here;
     }
   }

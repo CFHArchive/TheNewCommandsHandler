@@ -27,7 +27,8 @@ Commands:
 
         Validation:
 
-          #Valid Types: int, integer, String, Double, BigDecimal, int, boolean
+          #Valid Types: int, String,
+          #Double, BigDecimal, boolean
           Type: "int"
 
           MaxLength: 0
@@ -52,6 +53,10 @@ Commands:
         Alias:
           - H
           - E
+
+        Short:
+          - world
+          - w
 
         Author: "creatorfromhell"
 

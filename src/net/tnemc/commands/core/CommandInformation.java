@@ -59,7 +59,7 @@ public class CommandInformation {
 
   //Methods with logic
   public Optional<CommandInformation> find(String identifier) {
-    if(getIdentifiers().contains(identifier)) {
+    if(getIdentifiers(false).contains(identifier)) {
       return Optional.of(this);
     }
 
@@ -114,6 +114,24 @@ public class CommandInformation {
     List<String> identifiers = new ArrayList<>();
     identifiers.add(name);
     identifiers.addAll(aliases);
+
+    for(CommandInformation info : sub.values()) {
+      identifiers.addAll(info.getSubShort());
+    }
+
+    return identifiers;
+  }
+
+  public List<String> getIdentifiers(boolean shortValues) {
+    List<String> identifiers = new ArrayList<>();
+    identifiers.add(name);
+    identifiers.addAll(aliases);
+
+    if(shortValues) {
+      for(CommandInformation info : sub.values()) {
+        identifiers.addAll(info.getSubShort());
+      }
+    }
     return identifiers;
   }
 
@@ -210,5 +228,21 @@ public class CommandInformation {
     for(CommandParameter param : parameters)  {
       addParameter(param);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "CommandInformation {" +
+        "aliases=" + String.join(",", aliases) +
+        ", subCommand=" + subCommand +
+        ", subShort=" + subShort +
+        ", name='" + name + '\'' +
+        ", description='" + description + '\'' +
+        ", permission='" + permission + '\'' +
+        ", executor='" + executor + '\'' +
+        ", author='" + author + '\'' +
+        ", console=" + console +
+        ", developer=" + developer +
+        '}';
   }
 }

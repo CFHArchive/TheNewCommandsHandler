@@ -28,7 +28,7 @@ public class CuttlefishCommandLoader implements CommandLoader {
 
       final CommandInformation info = loadCommand(command, base);
 
-      CommandsHandler.manager().register(info.getAliases(), info);
+      CommandsHandler.manager().register(info.getIdentifiers(), info);
     }
   }
 

@@ -89,11 +89,11 @@ public class CommandsHandler {
   public List<String> tab(CommandSender sender, Command command, String label, String[] arguments) {
     final Optional<CommandInformation> information = manager.find(label);
 
-    if(information.isPresent()) {
+    /*if(information.isPresent()) {
       if(manager.getCompleters().containsKey(information.get().getCompleter(arguments.length))) {
          return manager.getCompleters().get(information.get().getCompleter(arguments.length)).complete(sender, command, label, arguments, information.get().isSubCommand());
       }
-    }
+    }*/
     return new ArrayList<>();
   }
 
@@ -107,6 +107,8 @@ public class CommandsHandler {
    */
   public boolean handle(CommandSender sender, Command command, String label, String[] arguments) {
 
+    //TODO: Test this then profit??
+
     final Optional<CommandInformation> information = manager.find(label);
 
     if(information.isPresent()) {
@@ -115,7 +117,10 @@ public class CommandsHandler {
           sender.sendMessage(ChatColor.RED + "I'm sorry, but you're not allowed to use that command.");
           return false;
         }
-        return manager.getExecutors().get(information.get().getExecutor()).execute(sender, command, label, arguments);
+
+        System.out.println(information.get().toString());
+        return true;
+        //return manager.getExecutors().get(information.get().getExecutor()).execute(sender, command, label, arguments);
       }
     }
     return false;
