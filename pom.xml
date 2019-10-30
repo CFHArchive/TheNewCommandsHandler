@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.tnemc</groupId>
     <artifactId>TNCH</artifactId>
-    <version>0.1.1.0</version>
+    <version>0.1.9.18</version>
     <packaging>jar</packaging>
     <name>The New Commands Handler</name>
     <properties>
@@ -16,11 +16,6 @@
         <finalName>${project.artifactId}-${project.version}</finalName>
         <testOutputDirectory>target/test-classes</testOutputDirectory>
         <sourceDirectory>src/</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/net/tnemc/commands/resources/</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

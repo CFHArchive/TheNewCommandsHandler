@@ -1,3 +1,21 @@
+Messages:
+
+  InvalidType: "<red>Parameter \"$parameter\" is of type $parameter_type."
+
+  InvalidLength: "<red>The max length of parameter \"$parameter\" is $max_length."
+
+  ParameterOption: "[$parameter]"
+
+  ParameterRequired: "<$parameter>"
+
+  CommandHelp: "$command $parameters - $description"
+
+  Developer: "<red>You must be a developer to use that command."
+
+  Console: "<red>This command is not usable from console."
+
+  InvalidPermission: "<red>I'm sorry, but you're not allowed to use that command."
+
 Commands:
 
   Hello:
@@ -17,34 +35,6 @@ Commands:
     Description: "Used to say hello"
 
     Executor: "hello_exe"
-
-    Params:
-
-      Message:
-
-        #The order this param is in the arguments array.
-        Order: 0
-
-        Validation:
-
-          #Valid Types: int, String,
-          #Double, BigDecimal, boolean
-          Type: "int"
-
-          MaxLength: 0
-
-          Regex:
-
-            Use: false
-
-            Statement: ""
-
-        Optional: true
-
-        Complete: true
-
-        CompleteType: "hello_messages"
-
 
     Sub:
 
@@ -69,6 +59,33 @@ Commands:
         Description: "Used to say hello to the world"
 
         Executor: "world_exe"
+
+        Params:
+
+          Player:
+
+            #The order this param is in the arguments array.
+            Order: 0
+
+            Validation:
+
+              #Valid Types: int, String,
+              #Double, BigDecimal, boolean
+              Type: "String"
+
+              MaxLength: 0
+
+              Regex:
+
+                Use: false
+
+                Statement: ""
+
+            Optional: true
+
+            Complete: true
+
+            CompleteType: "player"
 
 Completion:
 
