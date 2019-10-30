@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * The New Economy Minecraft Server Plugin
+ * The New Commands Handler Library
  * <p>
  * Created by creatorfromhell on 10/9/2019.
  * <p>
@@ -54,22 +54,32 @@ public class CommandManager {
     return false;
   }
 
-  public Optional<CommandInformation> find(String name) {
+  private Optional<CommandInformation> find(String name) {
 
     Iterator<Map.Entry<List<String>, CommandInformation>> it = commands.entrySet().iterator();
 
     while(it.hasNext()) {
       final Map.Entry<List<String>, CommandInformation> entry = it.next();
 
-      if(entry.getKey().contains(name)) return entry.getValue().find(name);
+      for(String str : entry.getKey()) {
+        if(str.equalsIgnoreCase(name)) return entry.getValue().find(name);
+      }
     }
     return Optional.empty();
   }
 
-  public void registerCommands() {
-    if(lastRegister == commands.size()) return;
+  public Optional<CommandSearchInformation> search(String name, String[] arguments) {
+    Optional<CommandInformation> information = find(name);
 
-    lastRegister = commands.size();
+    if(information.isPresent()) {
+      System.out.println(information.get().toString());
+      final CommandSearchInformation search = information.get().findSubInformation(arguments);
+      return Optional.of(search);
+    }
+    return Optional.empty();
+  }
+
+  public void init() {
     try {
       commandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
       commandMap.setAccessible(true);
@@ -78,6 +88,13 @@ public class CommandManager {
     } catch (Exception ignore) {
       /* do nothing */
     }
+  }
+
+  public void registerCommands() {
+    if(lastRegister == commands.size()) return;
+
+    lastRegister = commands.size();
+    init();
 
     if(commandMap != null && knownCommands != null) {
 
@@ -114,19 +131,24 @@ public class CommandManager {
     commands.put(alias, information);
 
     for (String s : alias) {
-      if(registered(s)) {
-        unregister(s, false);
+      if(registered(s.toLowerCase())) {
+        unregister(s.toLowerCase(), false);
       }
-      register(s);
+      register(s.toLowerCase());
     }
   }
 
   private void register(String command) {
     try {
+
+      if(commandMap == null) init();
+
       Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
       c.setAccessible(true);
+      System.out.println("CommandManager.register(" + command + ")");
       PluginCommand pluginCommand = c.newInstance(command, plugin);
       if(pluginCommand != null) {
+        System.out.println("CommandManager.register(" + command + ")");
         ((SimpleCommandMap) commandMap.get(Bukkit.getServer())).register(command, pluginCommand);
       }
     } catch(Exception ignore) {
@@ -145,7 +167,9 @@ public class CommandManager {
 
           boolean remove = false;
           for (String str : entry.getKey()) {
+            System.out.println("CommandManager.unregister(" + command + ")");
             if (str.equalsIgnoreCase(command)) {
+              System.out.println("CommandManager.unregister(remove = true)");
               remove = true;
             }
           }
@@ -182,6 +206,10 @@ public class CommandManager {
 
   public void setCompleters(Map<String, TabCompleter> completers) {
     this.completers = completers;
+  }
+
+  public void addExecutor(String name, CommandExecution execution) {
+    executors.put(name, execution);
   }
 
   public Map<String, CommandExecution> getExecutors() {

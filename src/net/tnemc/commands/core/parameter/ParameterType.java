@@ -70,6 +70,18 @@ public enum ParameterType {
     this.validator = validator;
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public String[] getAlias() {
+    return alias;
+  }
+
+  public ParameterValidator getValidator() {
+    return validator;
+  }
+
   public static Optional<ParameterType> find(String name) {
     for(ParameterType type : values()) {
       if(type.name.equalsIgnoreCase(name)) return Optional.of(type);

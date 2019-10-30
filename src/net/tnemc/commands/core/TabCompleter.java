@@ -3,9 +3,10 @@ package net.tnemc.commands.core;
 import org.bukkit.command.CommandSender;
 
 import java.util.LinkedList;
+import java.util.Optional;
 
 /**
- * The New Economy Minecraft Server Plugin
+ * The New Commands Handler Library
  * <p>
  * Created by creatorfromhell on 10/13/2019.
  * <p>
@@ -16,5 +17,5 @@ import java.util.LinkedList;
  */
 @FunctionalInterface
 public interface TabCompleter {
-  LinkedList<String> complete(CommandSender sender, String argument);
+  LinkedList<String> complete(CommandSender sender, Optional<CommandSearchInformation> search, String argument);
 }

@@ -1,8 +1,10 @@
 package net.tnemc.commands.core;
 
 import net.tnemc.commands.core.parameter.CommandParameter;
+import net.tnemc.commands.core.settings.MessageSettings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +14,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 /**
- * The New Economy Minecraft Server Plugin
+ * The New Commands Handler Library
  * <p>
  * Created by creatorfromhell on 10/12/2019.
  * <p>
@@ -28,6 +30,12 @@ public class CommandInformation {
 
   private Map<List<String>, CommandInformation> sub = new HashMap<>();
 
+  //The amount of parameters that are required.
+  private int requiredArguments = 0;
+
+  //Cached command help.
+  private String help = "";
+
   private List<String> aliases;
 
   private boolean subCommand = false;
@@ -36,6 +44,7 @@ public class CommandInformation {
   private String name;
   private String description;
   private String permission;
+
 
   private String executor;
   private String author;
@@ -59,8 +68,9 @@ public class CommandInformation {
 
   //Methods with logic
   public Optional<CommandInformation> find(String identifier) {
-    if(getIdentifiers(false).contains(identifier)) {
-      return Optional.of(this);
+
+    for(String str : getIdentifiers(false)) {
+      if(str.equalsIgnoreCase(identifier)) return Optional.of(this);
     }
 
     for(CommandInformation information : sub.values()) {
@@ -74,8 +84,57 @@ public class CommandInformation {
     return Optional.empty();
   }
 
+  public CommandSearchInformation findSubInformation(final String[] arguments) {
+
+    List<String> argumentsList = new ArrayList<>(Arrays.asList(arguments));
+
+    CommandInformation info = this;
+
+    CommandSearchInformation subInformation = new CommandSearchInformation(info);
+
+    String identifier = (argumentsList.size() > 0)? argumentsList.get(0) : "";
+
+    Optional<CommandInformation> sub;
+
+    System.out.println("ArgumentList Size: " + argumentsList.size());
+    System.out.println("Identifier: " + identifier);
+    while(!identifier.equalsIgnoreCase("") && (sub = findSub(identifier)).isPresent()) {
+      subInformation.setInformation(sub.get());
+
+      if(argumentsList.size() > 0) argumentsList.remove(0);
+      identifier = (argumentsList.size() > 0)? argumentsList.get(0) : "";
+    }
+
+    if(argumentsList.size() > 0) {
+      subInformation.setArguments(argumentsList.toArray(new String[argumentsList.size() - 1]));
+    } else {
+      subInformation.setArguments(new String[0]);
+    }
+
+    return subInformation;
+  }
+
   public String getCompleter(int argumentLength) {
+    System.out.println("Length: " + argumentLength);
+    if(parameters.containsKey(argumentLength)) {
+      System.out.println("Length: " + argumentLength);
+      final CommandParameter param = parameters.get(argumentLength);
+
+      System.out.println("comp: " + param.getCompleteType());
+      if(param.isTabComplete()) {
+        return param.getCompleteType();
+      }
+    }
     return "";
+  }
+
+  public Optional<CommandInformation> findSub(String name) {
+    for(Map.Entry<List<String>, CommandInformation> entry : sub.entrySet()) {
+      for(String str : entry.getKey()) {
+        if(str.equalsIgnoreCase(name)) return Optional.of(entry.getValue());
+      }
+    }
+    return Optional.empty();
   }
 
   //Getter/Setter methods below
@@ -86,15 +145,18 @@ public class CommandInformation {
 
   public boolean hasSub(String name) {
     for(List<String> identifiers : sub.keySet()) {
-      if(identifiers.contains(name)) return true;
+      for(String str : identifiers) {
+        if(str.equalsIgnoreCase(name)) return true;
+      }
     }
     return false;
   }
 
   public void addParameter(CommandParameter parameter) {
     if(parameter.getOrder() == -1) {
-      parameter.setOrder(parameters.lastKey() + 1);
+      parameter.setOrder(parameters.size());
     }
+    if(!parameter.isOptional()) requiredArguments += 1;
     parameters.put(parameter.getOrder(), parameter);
   }
 
@@ -108,6 +170,37 @@ public class CommandInformation {
 
   public void setParameters(NavigableMap<Integer, CommandParameter> parameters) {
     this.parameters = parameters;
+  }
+
+  public int getRequiredArguments() {
+    return requiredArguments;
+  }
+
+  public void setRequiredArguments(int requiredArguments) {
+    this.requiredArguments = requiredArguments;
+  }
+
+  public void buildHelp() {
+    String help = MessageSettings.commandHelp;
+    help = help.replace("$description", description);
+    help = help.replace("$parameters", buildParameters());
+
+    this.help = help;
+  }
+
+  public String buildParameters() {
+    StringBuilder builder = new StringBuilder();
+
+    for(CommandParameter param : parameters.values()) {
+      if(builder.length() > 0) builder.append(" ");
+      final String paramStr = (param.isOptional())? MessageSettings.parameterOption : MessageSettings.parameterRequired;
+      builder.append(paramStr.replace("$parameter", param.getName().toLowerCase()));
+    }
+    return builder.toString();
+  }
+
+  public String getHelp() {
+    return help;
   }
 
   public List<String> getIdentifiers() {

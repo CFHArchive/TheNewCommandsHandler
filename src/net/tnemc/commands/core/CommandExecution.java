@@ -4,7 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 /**
- * The New Economy Minecraft Server Plugin
+ * The New Commands Handler Library
  * <p>
  * Created by creatorfromhell on 10/9/2019.
  * <p>

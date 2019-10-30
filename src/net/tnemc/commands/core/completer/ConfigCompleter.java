@@ -1,34 +1,37 @@
 package net.tnemc.commands.core.completer;
 
+import net.tnemc.commands.core.CommandSearchInformation;
 import net.tnemc.commands.core.TabCompleter;
 import org.bukkit.command.CommandSender;
 
 import java.util.LinkedList;
+import java.util.Optional;
 
 public class ConfigCompleter implements TabCompleter {
 
-  private LinkedList<String> values;
+
+  private TabCompleter completer;
 
   private String name;
   private int limit;
 
-  public ConfigCompleter(LinkedList<String> values, String name, int limit) {
-    this.values = values;
+  public ConfigCompleter(TabCompleter completer, String name, int limit) {
+    this.completer = completer;
     this.name = name;
     this.limit = limit;
   }
 
   @Override
-  public LinkedList<String> complete(CommandSender sender, String argument) {
-    return values;
+  public LinkedList<String> complete(CommandSender sender, Optional<CommandSearchInformation> search, String argument) {
+    return completer.complete(sender, search, argument);
   }
 
-  public LinkedList<String> getValues() {
-    return values;
+  public TabCompleter getCompleter() {
+    return completer;
   }
 
-  public void setValues(LinkedList<String> values) {
-    this.values = values;
+  public void setCompleter(TabCompleter completer) {
+    this.completer = completer;
   }
 
   public String getName() {

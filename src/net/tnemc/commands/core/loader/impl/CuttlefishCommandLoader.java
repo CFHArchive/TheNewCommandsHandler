@@ -39,7 +39,7 @@ public class CuttlefishCommandLoader implements CommandLoader {
       final String base = "Completion." + completer;
 
       CommandsHandler.manager().getCompleters().put(completer, new ConfigCompleter(
-          config.getStringList(base + ".Values"),
+          (sender, search, argument)->config.getStringList(base + ".Values"),
           completer,
           config.getInt(base + ".Limit", 5)));
     }
@@ -67,6 +67,7 @@ public class CuttlefishCommandLoader implements CommandLoader {
     for(String subName : sub) {
       commandInfo.addSub(loadCommand(subName, base + ".Sub." + subName));
     }
+    commandInfo.buildHelp();
     return commandInfo;
   }
 

@@ -1,7 +1,7 @@
 package net.tnemc.commands.core.parameter;
 
 /**
- * The New Economy Minecraft Server Plugin
+ * The New Commands Handler Library
  * <p>
  * Created by creatorfromhell on 10/12/2019.
  * <p>

@@ -1,13 +1,19 @@
 package net.tnemc.commands.core;
 
+import net.tnemc.commands.core.completer.impl.PlayerCompleter;
+import net.tnemc.commands.core.completer.impl.SubCompleter;
 import net.tnemc.commands.core.loader.CommandLoader;
 import net.tnemc.commands.core.loader.impl.BukkitCommandLoader;
 import net.tnemc.commands.core.loader.impl.CuttlefishCommandLoader;
+import net.tnemc.commands.core.parameter.CommandParameter;
+import net.tnemc.commands.core.parameter.ParameterType;
+import net.tnemc.commands.core.settings.MessageSettings;
+import net.tnemc.commands.core.utils.ColourFormatter;
 import net.tnemc.config.CommentedConfiguration;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -15,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The New Economy Minecraft Server Plugin
+ * The New Commands Handler Library
  * <p>
  * Created by creatorfromhell on 10/12/2019.
  * <p>
@@ -31,6 +37,8 @@ public class CommandsHandler {
 
   private static CommandsHandler instance;
 
+  private List<String> developers = new ArrayList<>();
+
   public CommandsHandler(JavaPlugin plugin, FileConfiguration commandsFile) {
     instance = this;
 
@@ -43,6 +51,30 @@ public class CommandsHandler {
 
     loader = new CuttlefishCommandLoader(commandsFile);
     manager = new CommandManager(plugin, (information, sender)->sender.hasPermission(information.getPermission()));
+  }
+
+  public CommandsHandler(JavaPlugin plugin, FileConfiguration commandsFile, boolean testing) {
+    instance = this;
+
+    loader = new BukkitCommandLoader(commandsFile);
+
+    if(testing) {
+      manager = new CommandManager(plugin, (information, sender)->true);
+    } else {
+      manager = new CommandManager(plugin, (information, sender)->sender.hasPermission(information.getPermission()));
+    }
+  }
+
+  public CommandsHandler(JavaPlugin plugin, CommentedConfiguration commandsFile, boolean testing) {
+    instance = this;
+
+    loader = new CuttlefishCommandLoader(commandsFile);
+
+    if(testing) {
+      manager = new CommandManager(plugin, (information, sender)->true);
+    } else {
+      manager = new CommandManager(plugin, (information, sender)->sender.hasPermission(information.getPermission()));
+    }
   }
 
   public CommandsHandler(JavaPlugin plugin, CommandLoader loader) {
@@ -83,17 +115,39 @@ public class CommandsHandler {
    * Used to load everything from the command loader.
    */
   public void load() {
+
+    manager.getCompleters().put("player", new PlayerCompleter());
+    manager.getCompleters().put("sub_command", new SubCompleter());
+
     loader.load();
   }
 
+  /**
+   * Used to handle tab completion with registered commands.
+   * @param sender The instance of Bukkit's {@link CommandSender} class.
+   * @param command The instance of Bukkit's {@link Command} class.
+   * @param label The String used as a command. Example: test would be the label in /test hi
+   * @param arguments A String array of the arguments provided for the command executed.
+   * @return A list containing the tab completion values.
+   */
   public List<String> tab(CommandSender sender, Command command, String label, String[] arguments) {
-    final Optional<CommandInformation> information = manager.find(label);
+    Optional<CommandSearchInformation> search = manager.search(label, arguments);
 
-    /*if(information.isPresent()) {
-      if(manager.getCompleters().containsKey(information.get().getCompleter(arguments.length))) {
-         return manager.getCompleters().get(information.get().getCompleter(arguments.length)).complete(sender, command, label, arguments, information.get().isSubCommand());
+    if(search.isPresent() && search.get().getInformation().isPresent()) {
+
+      arguments = search.get().getArguments();
+
+      final String argument = (arguments.length > 0)? arguments[arguments.length - 1] : "";
+
+      if(arguments.length > 0) {
+        final Optional<CommandInformation> information = search.get().getInformation();
+        if(manager.getCompleters().containsKey(information.get().getCompleter(arguments.length - 1))) {
+          return manager.getCompleters().get(information.get().getCompleter(arguments.length - 1))
+              .complete(sender, search, argument);
+        }
       }
-    }*/
+      return manager.getCompleters().get("sub_command").complete(sender, search, argument);
+    }
     return new ArrayList<>();
   }
 
@@ -107,23 +161,78 @@ public class CommandsHandler {
    */
   public boolean handle(CommandSender sender, Command command, String label, String[] arguments) {
 
-    //TODO: Test this then profit??
+    final boolean player = (sender instanceof Player);
 
-    final Optional<CommandInformation> information = manager.find(label);
+    Optional<CommandSearchInformation> search = manager.search(label, arguments);
 
-    if(information.isPresent()) {
+    if(search.isPresent() && search.get().getInformation().isPresent()) {
+      final Optional<CommandInformation> information = search.get().getInformation();
+      arguments = search.get().getArguments();
+
       if(manager.getExecutors().containsKey(information.get().getExecutor())) {
-        if(!manager.getExecutors().get(information.get().getExecutor()).canExecute(information.get(), sender)) {
-          sender.sendMessage(ChatColor.RED + "I'm sorry, but you're not allowed to use that command.");
+
+        if(!player && !information.get().isConsole()) {
+          sender.sendMessage(ColourFormatter.format(MessageSettings.console, false));
           return false;
         }
 
-        System.out.println(information.get().toString());
-        return true;
-        //return manager.getExecutors().get(information.get().getExecutor()).execute(sender, command, label, arguments);
+        if(!information.get().isDeveloper() && !manager.getExecutors().get(information.get().getExecutor()).canExecute(information.get(), sender)) {
+          sender.sendMessage(ColourFormatter.format(MessageSettings.invalidPermission, false));
+          return false;
+        }
+
+        if(information.get().isDeveloper()) {
+          if(!player || !developers.contains(((Player)sender).getUniqueId().toString())) {
+            sender.sendMessage(ColourFormatter.format(MessageSettings.developer, false));
+            return false;
+          }
+        }
+
+        if(search.get().getInformation().get().getRequiredArguments() < arguments.length) {
+          sender.sendMessage(ColourFormatter.format(search.get().getInformation().get().getHelp(), false));
+          return false;
+        }
+
+        for(int i = 0; i < arguments.length; i++) {
+          final CommandParameter param = search.get().getInformation().get().getParameters().get(i);
+
+          if(param != null) {
+
+            final Optional<ParameterType> type = ParameterType.find(param.getType());
+            if(type.isPresent() && !type.get().getValidator().valid(param.getRegex(), arguments[i])) {
+              sender.sendMessage(ColourFormatter.format(MessageSettings.invalidType
+                                                            .replace("$parameter", param.getName())
+                                                            .replace("$parameter_type", param.getType()), false));
+              return false;
+            }
+
+            if(type.isPresent() && type.get().getName().equalsIgnoreCase("string")
+                && param.getMaxLength() > 0) {
+              if(arguments[i].length() > param.getMaxLength()) {
+                sender.sendMessage(ColourFormatter.format(MessageSettings.invalidLength
+                                                              .replace("$parameter", param.getName())
+                                                              .replace("$max_length",
+                                                                       param.getMaxLength() + ""),
+                                                          false));
+                return false;
+              }
+            }
+          }
+        }
+
+        return manager.getExecutors().get(information.get().getExecutor()).execute(sender, command, label, arguments);
       }
     }
     return false;
+  }
+
+  /**
+   * Used to add a new {@link CommandExecution executor} to TNCH.
+   * @param name The name of the command executor
+   * @param executor The instance of the executor
+   */
+  public void addExecutor(String name, CommandExecution executor) {
+    manager.addExecutor(name, executor);
   }
 
   public static CommandManager manager() {
@@ -132,5 +241,13 @@ public class CommandsHandler {
 
   public static CommandsHandler instance() {
     return instance;
+  }
+
+  public List<String> getDevelopers() {
+    return developers;
+  }
+
+  public void setDevelopers(List<String> developers) {
+    this.developers = developers;
   }
 }

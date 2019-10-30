@@ -2,6 +2,7 @@ package net.tnemc.commands.core.loader.impl;
 
 import net.tnemc.commands.core.CommandInformation;
 import net.tnemc.commands.core.CommandsHandler;
+import net.tnemc.commands.core.TabCompleter;
 import net.tnemc.commands.core.completer.ConfigCompleter;
 import net.tnemc.commands.core.loader.CommandLoader;
 import net.tnemc.commands.core.parameter.CommandParameter;
@@ -37,11 +38,25 @@ public class BukkitCommandLoader implements CommandLoader {
     for(String completer : completers) {
       final String base = "Completion." + completer;
 
-      CommandsHandler.manager().getCompleters().put(completer, new ConfigCompleter(
-          new LinkedList<>(config.getStringList(base + ".Values")),
-          completer,
-          config.getInt(base + ".Limit", 5)
-      ));
+      if(CommandsHandler.manager().getCompleters().containsKey(completer.toLowerCase())) {
+        TabCompleter completerObj = CommandsHandler.manager().getCompleters().get(completer.toLowerCase());
+        if(completerObj instanceof ConfigCompleter) {
+          ((ConfigCompleter)completerObj).setLimit(config.getInt(base + ".Limit", 5));
+        } else {
+          CommandsHandler.manager().getCompleters().put(completer.toLowerCase(), new ConfigCompleter(
+              completerObj,
+              completer,
+              config.getInt(base + ".Limit", 5)
+          ));
+        }
+        CommandsHandler.manager().getCompleters().put(completer.toLowerCase(), completerObj);
+      } else {
+        CommandsHandler.manager().getCompleters().put(completer.toLowerCase(), new ConfigCompleter(
+            (sender, search, argument)->new LinkedList<>(config.getStringList(base + ".Values")),
+            completer,
+            config.getInt(base + ".Limit", 5)
+        ));
+      }
     }
   }
 
@@ -62,11 +77,14 @@ public class BukkitCommandLoader implements CommandLoader {
 
     commandInfo.addParameters(loadParameters(name, base));
 
-    final Set<String> sub = config.getConfigurationSection(base + ".Sub").getKeys(false);
+    if(config.contains(base + ".Sub")) {
+      final Set<String> sub = config.getConfigurationSection(base + ".Sub").getKeys(false);
 
-    for(String subName : sub) {
-      commandInfo.addSub(loadCommand(subName, base + ".Sub." + subName));
+      for(String subName : sub) {
+        commandInfo.addSub(loadCommand(subName, base + ".Sub." + subName));
+      }
     }
+    commandInfo.buildHelp();
     return commandInfo;
   }
 
@@ -74,30 +92,35 @@ public class BukkitCommandLoader implements CommandLoader {
   public LinkedList<CommandParameter> loadParameters(String command, String configBase) {
     LinkedList<CommandParameter> parameters = new LinkedList<>();
 
-    final Set<String> params = config.getConfigurationSection(configBase + ".Params").getKeys(false);
+    if(config.contains(configBase + ".Params")) {
 
-    for(String parameter : params) {
+      final Set<String> params = config.getConfigurationSection(configBase + ".Params").getKeys(false);
 
-      final String paramBase = configBase + ".Params." + parameter;
-      CommandParameter param = new CommandParameter(parameter.toLowerCase());
+      for(String parameter : params) {
 
-      param.setOrder(config.getInt(paramBase + ".Order", -1));
+        final String paramBase = configBase + ".Params." + parameter;
+        CommandParameter param = new CommandParameter(parameter.toLowerCase());
 
-      //Validation-related variables
-      final String type = config.getString(paramBase + ".Validation.Type", "string");
-      if(ParameterType.exists(type)) param.setType(type);
+        param.setOrder(config.getInt(paramBase + ".Order", -1));
 
-      param.setMaxLength(config.getInt(paramBase + ".Validation.MaxLength", 0));
-      param.setUseRegex(config.getBoolean(paramBase + ".Validation.Regex.Use", false));
-      param.setRegex(config.getString(paramBase + ".Validation.Regex.Statement", ""));
+        //Validation-related variables
+        final String type = config.getString(paramBase + ".Validation.Type", "string");
+        if(ParameterType.exists(type)) param.setType(type);
 
+        param.setMaxLength(config.getInt(paramBase + ".Validation.MaxLength", 0));
+        param.setUseRegex(config.getBoolean(paramBase + ".Validation.Regex.Use", false));
 
-      //Our core param variables
-      param.setOptional(config.getBoolean(paramBase + ".Optional", true));
-      param.setTabComplete(config.getBoolean(paramBase + ".Complete", false));
-      param.setCompleteType(config.getString(paramBase + ".CompleteType", "Player"));
+        if(param.isUseRegex()) {
+          param.setRegex(config.getString(paramBase + ".Validation.Regex.Statement", ""));
+        }
 
-      parameters.add(param);
+        //Our core param variables
+        param.setOptional(config.getBoolean(paramBase + ".Optional", true));
+        param.setTabComplete(config.getBoolean(paramBase + ".Complete", false));
+        param.setCompleteType(config.getString(paramBase + ".CompleteType", "Player"));
+
+        parameters.add(param);
+      }
     }
     return parameters;
   }
