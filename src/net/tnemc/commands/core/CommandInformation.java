@@ -33,6 +33,9 @@ public class CommandInformation {
   //The amount of parameters that are required.
   private int requiredArguments = 0;
 
+  //The instance of the parent command
+  private CommandInformation parent;
+
   //Cached command help.
   private String help = "";
 
@@ -181,11 +184,29 @@ public class CommandInformation {
   }
 
   public void buildHelp() {
-    String help = MessageSettings.commandHelp;
+    String help = CommandsHandler.manager().translate("Messages.Command.CommandHelp", MessageSettings.commandHelp);
+    help = help.replace("$command", buildCommand());
     help = help.replace("$description", description);
     help = help.replace("$parameters", buildParameters());
 
     this.help = help;
+  }
+
+  public String buildCommand() {
+    StringBuilder builder = new StringBuilder();
+
+    CommandInformation information = this;
+
+    while(information.isSubCommand()) {
+      String append = information.name;
+
+      if(builder.length() > 0) append += " ";
+
+      builder.insert(0, append);
+
+      information = information.parent;
+    }
+    return builder.toString();
   }
 
   public String buildParameters() {
@@ -193,7 +214,8 @@ public class CommandInformation {
 
     for(CommandParameter param : parameters.values()) {
       if(builder.length() > 0) builder.append(" ");
-      final String paramStr = (param.isOptional())? MessageSettings.parameterOption : MessageSettings.parameterRequired;
+      final String paramStr = (param.isOptional())? CommandsHandler.manager().translate("Messages.Parameter.ParameterOption", MessageSettings.parameterOption) :
+          CommandsHandler.manager().translate("Messages.Parameter.ParameterRequired", MessageSettings.parameterRequired);
       builder.append(paramStr.replace("$parameter", param.getName().toLowerCase()));
     }
     return builder.toString();
@@ -226,6 +248,14 @@ public class CommandInformation {
       }
     }
     return identifiers;
+  }
+
+  public CommandInformation getParent() {
+    return parent;
+  }
+
+  public void setParent(CommandInformation parent) {
+    this.parent = parent;
   }
 
   public Map<List<String>, CommandInformation> getSub() {

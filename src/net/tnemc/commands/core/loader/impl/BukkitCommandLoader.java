@@ -7,6 +7,7 @@ import net.tnemc.commands.core.completer.ConfigCompleter;
 import net.tnemc.commands.core.loader.CommandLoader;
 import net.tnemc.commands.core.parameter.CommandParameter;
 import net.tnemc.commands.core.parameter.ParameterType;
+import net.tnemc.commands.core.settings.MessageSettings;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.LinkedList;
@@ -20,13 +21,41 @@ public class BukkitCommandLoader implements CommandLoader {
     this.config = config;
   }
 
+  public void loadMessages() {
+    //Our parameters messages
+    MessageSettings.invalidType = config.getString("Messages.Parameter.InvalidType",
+                                                   "<red>Parameter \"$parameter\" is of type $parameter_type.");
+
+    MessageSettings.invalidLength = config.getString("Messages.Parameter.InvalidLength",
+                                                   "<red>The max length of parameter \"$parameter\" is $max_length.");
+
+    MessageSettings.parameterOption = config.getString("Messages.Parameter.ParameterOption",
+                                                   "[$parameter]");
+
+    MessageSettings.parameterRequired = config.getString("Messages.Parameter.ParameterRequired",
+                                                   "<$parameter>");
+
+    //Our command messages
+    MessageSettings.commandHelp = config.getString("Messages.Command.CommandHelp",
+                                                   "$command $parameters - $description");
+
+    MessageSettings.developer = config.getString("Messages.Command.Developer",
+                                                   "<red>You must be a developer to use that command.");
+
+    MessageSettings.console = config.getString("Messages.Command.Console",
+                                                   "<red>This command is not usable from console.");
+
+    MessageSettings.invalidPermission = config.getString("Messages.Command.InvalidPermission",
+                                                   "<red>I'm sorry, but you're not allowed to use that command.");
+  }
+
   public void loadCommands() {
     final Set<String> commands = config.getConfigurationSection("Commands").getKeys(false);
 
     for(String command : commands) {
       final String base = "Commands." + command;
 
-      final CommandInformation info = loadCommand(command, base);
+      final CommandInformation info = loadCommand(command, base, null);
 
       CommandsHandler.manager().register(info.getIdentifiers(), info);
     }
@@ -60,8 +89,10 @@ public class BukkitCommandLoader implements CommandLoader {
     }
   }
 
-  public CommandInformation loadCommand(String name, String base) {
+  public CommandInformation loadCommand(String name, String base, CommandInformation parent) {
     CommandInformation commandInfo = new CommandInformation(name);
+
+    commandInfo.setParent(parent);
 
     commandInfo.setAliases(config.getStringList(base + ".Alias"));
     commandInfo.setAuthor(config.getString(base + ".Author", "Magic"));
@@ -81,7 +112,7 @@ public class BukkitCommandLoader implements CommandLoader {
       final Set<String> sub = config.getConfigurationSection(base + ".Sub").getKeys(false);
 
       for(String subName : sub) {
-        commandInfo.addSub(loadCommand(subName, base + ".Sub." + subName));
+        commandInfo.addSub(loadCommand(subName, base + ".Sub." + subName, commandInfo));
       }
     }
     commandInfo.buildHelp();

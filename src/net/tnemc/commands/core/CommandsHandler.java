@@ -9,6 +9,7 @@ import net.tnemc.commands.core.parameter.CommandParameter;
 import net.tnemc.commands.core.parameter.ParameterType;
 import net.tnemc.commands.core.settings.MessageSettings;
 import net.tnemc.commands.core.utils.ColourFormatter;
+import net.tnemc.commands.core.utils.CommandTranslator;
 import net.tnemc.config.CommentedConfiguration;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -172,18 +173,18 @@ public class CommandsHandler {
       if(manager.getExecutors().containsKey(information.get().getExecutor())) {
 
         if(!player && !information.get().isConsole()) {
-          sender.sendMessage(ColourFormatter.format(MessageSettings.console, false));
+          sender.sendMessage(manager.translate("Messages.Command.Console", ColourFormatter.format(MessageSettings.console, false)));
           return false;
         }
 
         if(!information.get().isDeveloper() && !manager.getExecutors().get(information.get().getExecutor()).canExecute(information.get(), sender)) {
-          sender.sendMessage(ColourFormatter.format(MessageSettings.invalidPermission, false));
+          sender.sendMessage(manager.translate("Messages.Command.InvalidPermission", ColourFormatter.format(MessageSettings.invalidPermission, false)));
           return false;
         }
 
         if(information.get().isDeveloper()) {
           if(!player || !developers.contains(((Player)sender).getUniqueId().toString())) {
-            sender.sendMessage(ColourFormatter.format(MessageSettings.developer, false));
+            sender.sendMessage(manager.translate("Messages.Command.Developer", ColourFormatter.format(MessageSettings.developer, false)));
             return false;
           }
         }
@@ -200,20 +201,18 @@ public class CommandsHandler {
 
             final Optional<ParameterType> type = ParameterType.find(param.getType());
             if(type.isPresent() && !type.get().getValidator().valid(param.getRegex(), arguments[i])) {
-              sender.sendMessage(ColourFormatter.format(MessageSettings.invalidType
-                                                            .replace("$parameter", param.getName())
-                                                            .replace("$parameter_type", param.getType()), false));
+              sender.sendMessage(manager.translate("Messages.Parameter.InvalidType", ColourFormatter.format(MessageSettings.invalidType
+                                                                                  .replace("$parameter", param.getName())
+                                                                                  .replace("$parameter_type", param.getType()), false)));
               return false;
             }
 
             if(type.isPresent() && type.get().getName().equalsIgnoreCase("string")
                 && param.getMaxLength() > 0) {
               if(arguments[i].length() > param.getMaxLength()) {
-                sender.sendMessage(ColourFormatter.format(MessageSettings.invalidLength
-                                                              .replace("$parameter", param.getName())
-                                                              .replace("$max_length",
-                                                                       param.getMaxLength() + ""),
-                                                          false));
+                sender.sendMessage(manager.translate("Messages.Parameter.InvalidLength", ColourFormatter.format(MessageSettings.invalidLength
+                                                                                                                  .replace("$parameter", param.getName())
+                                                                                                                  .replace("$parameter_type", param.getType()), false)));
                 return false;
               }
             }
@@ -224,6 +223,35 @@ public class CommandsHandler {
       }
     }
     return false;
+  }
+
+  /**
+   * Used to load everything for this {@link CommandsHandler}.
+   * @return This {@link CommandsHandler}
+   */
+  public CommandsHandler loadEverything() {
+    load();
+    return this;
+  }
+
+  /**
+   * Used to change the list of developer UUIDs used by this {@link CommandsHandler}.
+   * @param developers The list of String-based UUIDs for all developers.
+   * @return This {@link CommandsHandler}
+   */
+  public CommandsHandler withDevelopers(final List<String> developers) {
+    setDevelopers(developers);
+    return this;
+  }
+
+  /**
+   * Used to change the {@link CommandTranslator} used.
+   * @param translator The {@link CommandTranslator} to use.
+   * @return This {@link CommandsHandler}
+   */
+  public CommandsHandler withTranslator(CommandTranslator translator) {
+    manager.setTranslator(translator);
+    return this;
   }
 
   /**

@@ -1,20 +1,24 @@
 Messages:
 
-  InvalidType: "<red>Parameter \"$parameter\" is of type $parameter_type."
+  Parameter:
 
-  InvalidLength: "<red>The max length of parameter \"$parameter\" is $max_length."
+    InvalidType: "<red>Parameter \"$parameter\" is of type $parameter_type."
 
-  ParameterOption: "[$parameter]"
+    InvalidLength: "<red>The max length of parameter \"$parameter\" is $max_length."
 
-  ParameterRequired: "<$parameter>"
+    ParameterOption: "[$parameter]"
 
-  CommandHelp: "$command $parameters - $description"
+    ParameterRequired: "<$parameter>"
 
-  Developer: "<red>You must be a developer to use that command."
+  Command:
 
-  Console: "<red>This command is not usable from console."
+    CommandHelp: "$command $parameters - $description"
 
-  InvalidPermission: "<red>I'm sorry, but you're not allowed to use that command."
+    Developer: "<red>You must be a developer to use that command."
+
+    Console: "<red>This command is not usable from console."
+
+    InvalidPermission: "<red>I'm sorry, but you're not allowed to use that command."
 
 Commands:
 

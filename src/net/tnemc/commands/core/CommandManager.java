@@ -1,5 +1,6 @@
 package net.tnemc.commands.core;
 
+import net.tnemc.commands.core.utils.CommandTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
@@ -14,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * The New Commands Handler Library
@@ -33,6 +33,7 @@ public class CommandManager {
   Map<String, CommandExecution> executors = new HashMap<>();
 
   private CommandPermissionHandler permissionHandler;
+  private CommandTranslator translator = null;
 
   final JavaPlugin plugin;
 
@@ -45,13 +46,19 @@ public class CommandManager {
     this.permissionHandler = permissionHandler;
   }
 
-  public boolean hasCommand(String name) {
-    Set<List<String>> keys = commands.keySet();
+  /**
+   * Used to translate a String with the {@link CommandTranslator}.
+   * @param message The message to translate.
+   * @param defaultMessage The default message if the message isn't translated.
+   * @return The translated output when possible, otherwise the default message.
+   */
+  public String translate(String message, String defaultMessage) {
+    if(translator != null) {
+      final Optional<String> translated = translator.translateText(message);
 
-    for(List<String> identifiers : keys) {
-      if(identifiers.contains(name)) return true;
+      if(translated.isPresent()) return translated.get();
     }
-    return false;
+    return defaultMessage;
   }
 
   private Optional<CommandInformation> find(String name) {
@@ -68,6 +75,13 @@ public class CommandManager {
     return Optional.empty();
   }
 
+  /**
+   * Used to conduct a command search. This will automagically find any sub commands using the
+   * arguments array too.
+   * @param name The command identifier.
+   * @param arguments The String array of arguments passed in the command call.
+   * @return The {@link CommandSearchInformation} object associated with this search.
+   */
   public Optional<CommandSearchInformation> search(String name, String[] arguments) {
     Optional<CommandInformation> information = find(name);
 
@@ -79,6 +93,9 @@ public class CommandManager {
     return Optional.empty();
   }
 
+  /**
+   * ONLY USE THIS IF YOU KNOW WHAT YOU'RE DOING.
+   */
   public void init() {
     try {
       commandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
@@ -226,6 +243,14 @@ public class CommandManager {
 
   public void setPermissionHandler(CommandPermissionHandler permissionHandler) {
     this.permissionHandler = permissionHandler;
+  }
+
+  public CommandTranslator getTranslator() {
+    return translator;
+  }
+
+  public void setTranslator(CommandTranslator translator) {
+    this.translator = translator;
   }
 
   public JavaPlugin getPlugin() {
