@@ -52,13 +52,16 @@ public class CommandInformation {
   private String executor;
   private String author;
   private boolean console;
+  private boolean player;
   private boolean developer;
 
   public CommandInformation(String name) {
     this.name = name;
   }
 
-  public CommandInformation(List<String> aliases, String name, String description, String permission, String executor, String author, boolean console, boolean developer) {
+  public CommandInformation(List<String> aliases, String name, String description, String permission,
+                            String executor, String author, boolean console, boolean player,
+                            boolean developer) {
     this.aliases = aliases;
     this.name = name;
     this.description = description;
@@ -66,6 +69,7 @@ public class CommandInformation {
     this.executor = executor;
     this.author = author;
     this.console = console;
+    this.player = player;
     this.developer = developer;
   }
 
@@ -343,6 +347,14 @@ public class CommandInformation {
 
   public void setConsole(boolean console) {
     this.console = console;
+  }
+
+  public boolean isPlayer() {
+    return player;
+  }
+
+  public void setPlayer(boolean player) {
+    this.player = player;
   }
 
   public boolean isDeveloper() {

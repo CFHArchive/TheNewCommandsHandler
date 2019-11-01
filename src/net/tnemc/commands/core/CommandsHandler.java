@@ -177,6 +177,11 @@ public class CommandsHandler {
           return false;
         }
 
+        if(player && !information.get().isPlayer()) {
+          sender.sendMessage(manager.translate("Messages.Command.Player", ColourFormatter.format(MessageSettings.player, false)));
+          return false;
+        }
+
         if(!information.get().isDeveloper() && !manager.getExecutors().get(information.get().getExecutor()).canExecute(information.get(), sender)) {
           sender.sendMessage(manager.translate("Messages.Command.InvalidPermission", ColourFormatter.format(MessageSettings.invalidPermission, false)));
           return false;

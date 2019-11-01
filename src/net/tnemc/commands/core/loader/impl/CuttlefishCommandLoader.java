@@ -53,6 +53,10 @@ public class CuttlefishCommandLoader implements CommandLoader {
                                                "<red>This command is not usable from console."
     );
 
+    MessageSettings.player = config.getString("Messages.Command.Console",
+                                               "<red>This command is not usable from in-game."
+    );
+
     MessageSettings.invalidPermission = config.getString("Messages.Command.InvalidPermission",
                                                          "<red>I'm sorry, but you're not allowed to use that command."
     );
@@ -103,12 +107,13 @@ public class CuttlefishCommandLoader implements CommandLoader {
 
     commandInfo.setParent(parent);
 
-    commandInfo.setAliases(config.getStringList(base + ".Alias"));
+    commandInfo.setAliases(CommandsHandler.manager().translate(base + ".Alias", config.getStringList(base + ".Alias")));
     commandInfo.setAuthor(config.getString(base + ".Author", "Magic"));
     commandInfo.setPermission(config.getString(base + ".Permission", ""));
     commandInfo.setConsole(config.getBool(base + ".Console", true));
+    commandInfo.setPlayer(config.getBool(base + ".Player", true));
     commandInfo.setDeveloper(config.getBool(base + ".Developer", false));
-    commandInfo.setDescription(config.getString(base + ".Description", "No description provided."));
+    commandInfo.setDescription(CommandsHandler.manager().translate(base + ".Description", config.getString(base + ".Description", "No description provided.")));
     commandInfo.setExecutor(config.getString(base + ".Executor", "hello_exe"));
 
     if(config.contains(base + ".Short")) {

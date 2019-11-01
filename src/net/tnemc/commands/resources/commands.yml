@@ -18,6 +18,8 @@ Messages:
 
     Console: "<red>This command is not usable from console."
 
+    Player: "<red>This command is not usable from in-game."
+
     InvalidPermission: "<red>I'm sorry, but you're not allowed to use that command."
 
 Commands:
@@ -25,14 +27,16 @@ Commands:
   Hello:
 
     Alias:
-      - H
-      - E
+      - h
+      - e
 
     Author: "creatorfromhell"
 
     Permission: "hello"
 
     Console: true
+
+    Player: false
 
     Developer: false
 
@@ -45,8 +49,8 @@ Commands:
       World:
 
         Alias:
-          - H
-          - E
+          - w
+          - wo
 
         Short:
           - world
@@ -56,7 +60,9 @@ Commands:
 
         Permission: "hello.world"
 
-        Console: true
+        Console: false
+
+        Player: true
 
         Developer: false
 

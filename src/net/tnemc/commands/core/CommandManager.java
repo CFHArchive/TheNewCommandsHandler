@@ -47,6 +47,21 @@ public class CommandManager {
   }
 
   /**
+   * Used to translate a configuration node into a list of Strings with the {@link CommandTranslator}.
+   * @param message The message to translate.
+   * @param defaultMessage The default message if the message isn't translated.
+   * @return The translated output when possible, otherwise the default message.
+   */
+  public List<String> translate(String message, List<String> defaultMessage) {
+    if(translator != null) {
+      final Optional<List<String>> translated = translator.translateToList(message);
+
+      if(translated.isPresent()) return translated.get();
+    }
+    return defaultMessage;
+  }
+
+  /**
    * Used to translate a String with the {@link CommandTranslator}.
    * @param message The message to translate.
    * @param defaultMessage The default message if the message isn't translated.
