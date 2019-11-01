@@ -12,7 +12,7 @@ Messages:
 
   Command:
 
-    CommandHelp: "$command $parameters - $description"
+    CommandHelp: "Correct usage: /$command $parameters - $description"
 
     Developer: "<red>You must be a developer to use that command."
 

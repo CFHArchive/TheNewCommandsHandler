@@ -86,7 +86,7 @@ public class CommandManager {
     Optional<CommandInformation> information = find(name);
 
     if(information.isPresent()) {
-      System.out.println(information.get().toString());
+      //System.out.println(information.get().toString());
       final CommandSearchInformation search = information.get().findSubInformation(arguments);
       return Optional.of(search);
     }
@@ -162,10 +162,10 @@ public class CommandManager {
 
       Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
       c.setAccessible(true);
-      System.out.println("CommandManager.register(" + command + ")");
+      //System.out.println("CommandManager.register(" + command + ")");
       PluginCommand pluginCommand = c.newInstance(command, plugin);
       if(pluginCommand != null) {
-        System.out.println("CommandManager.register(" + command + ")");
+        //System.out.println("CommandManager.register(" + command + ")");
         ((SimpleCommandMap) commandMap.get(Bukkit.getServer())).register(command, pluginCommand);
       }
     } catch(Exception ignore) {
@@ -184,9 +184,9 @@ public class CommandManager {
 
           boolean remove = false;
           for (String str : entry.getKey()) {
-            System.out.println("CommandManager.unregister(" + command + ")");
+            //System.out.println("CommandManager.unregister(" + command + ")");
             if (str.equalsIgnoreCase(command)) {
-              System.out.println("CommandManager.unregister(remove = true)");
+              //System.out.println("CommandManager.unregister(remove = true)");
               remove = true;
             }
           }

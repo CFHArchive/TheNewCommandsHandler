@@ -99,8 +99,8 @@ public class CommandInformation {
 
     Optional<CommandInformation> sub;
 
-    System.out.println("ArgumentList Size: " + argumentsList.size());
-    System.out.println("Identifier: " + identifier);
+    //System.out.println("ArgumentList Size: " + argumentsList.size());
+    //System.out.println("Identifier: " + identifier);
     while(!identifier.equalsIgnoreCase("") && (sub = findSub(identifier)).isPresent()) {
       subInformation.setInformation(sub.get());
 
@@ -118,12 +118,12 @@ public class CommandInformation {
   }
 
   public String getCompleter(int argumentLength) {
-    System.out.println("Length: " + argumentLength);
+    //System.out.println("Length: " + argumentLength);
     if(parameters.containsKey(argumentLength)) {
-      System.out.println("Length: " + argumentLength);
+      //System.out.println("Length: " + argumentLength);
       final CommandParameter param = parameters.get(argumentLength);
 
-      System.out.println("comp: " + param.getCompleteType());
+      //System.out.println("comp: " + param.getCompleteType());
       if(param.isTabComplete()) {
         return param.getCompleteType();
       }
@@ -160,6 +160,7 @@ public class CommandInformation {
       parameter.setOrder(parameters.size());
     }
     if(!parameter.isOptional()) requiredArguments += 1;
+    //System.out.println("Required Params: " + requiredArguments);
     parameters.put(parameter.getOrder(), parameter);
   }
 
@@ -198,14 +199,20 @@ public class CommandInformation {
     CommandInformation information = this;
 
     while(information.isSubCommand()) {
-      String append = information.name;
+      information = information.parent;
+
+      String append = information.name.toLowerCase();
 
       if(builder.length() > 0) append += " ";
 
       builder.insert(0, append);
-
-      information = information.parent;
     }
+
+    String append = information.name.toLowerCase();
+    if(builder.length() > 0) append += " ";
+
+    builder.insert(0, append);
+
     return builder.toString();
   }
 

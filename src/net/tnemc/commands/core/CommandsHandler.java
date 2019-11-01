@@ -189,7 +189,7 @@ public class CommandsHandler {
           }
         }
 
-        if(search.get().getInformation().get().getRequiredArguments() < arguments.length) {
+        if(search.get().getInformation().get().getRequiredArguments() > arguments.length) {
           sender.sendMessage(ColourFormatter.format(search.get().getInformation().get().getHelp(), false));
           return false;
         }

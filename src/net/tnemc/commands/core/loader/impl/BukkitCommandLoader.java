@@ -37,7 +37,7 @@ public class BukkitCommandLoader implements CommandLoader {
 
     //Our command messages
     MessageSettings.commandHelp = config.getString("Messages.Command.CommandHelp",
-                                                   "$command $parameters - $description");
+                                                   "Correct usage: /$command $parameters - $description");
 
     MessageSettings.developer = config.getString("Messages.Command.Developer",
                                                    "<red>You must be a developer to use that command.");
