@@ -260,6 +260,25 @@ public class CommandsHandler {
   }
 
   /**
+   * Used to change the {@link CommandTranslator} used.
+   * @param translator The {@link CommandTranslator} to use.
+   */
+  public void setTranslator(CommandTranslator translator) {
+    manager.setTranslator(translator);
+  }
+
+  /**
+   * Used to add a new {@link CommandExecution executor} to TNCH.
+   * @param name The name of the command executor
+   * @param executor The instance of the executor
+   * @return This {@link CommandsHandler}
+   */
+  public CommandsHandler withExecutor(String name, CommandExecution executor) {
+    manager.addExecutor(name, executor);
+    return this;
+  }
+
+  /**
    * Used to add a new {@link CommandExecution executor} to TNCH.
    * @param name The name of the command executor
    * @param executor The instance of the executor
