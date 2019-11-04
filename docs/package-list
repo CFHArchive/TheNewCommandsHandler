@@ -1,0 +1,8 @@
+net.tnemc.commands.core
+net.tnemc.commands.core.completer
+net.tnemc.commands.core.completer.impl
+net.tnemc.commands.core.loader
+net.tnemc.commands.core.loader.impl
+net.tnemc.commands.core.parameter
+net.tnemc.commands.core.settings
+net.tnemc.commands.core.utils
