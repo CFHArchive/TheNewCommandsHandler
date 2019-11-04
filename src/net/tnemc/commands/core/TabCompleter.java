@@ -17,5 +17,6 @@ import java.util.Optional;
  */
 @FunctionalInterface
 public interface TabCompleter {
+
   LinkedList<String> complete(CommandSender sender, Optional<CommandSearchInformation> search, String argument);
 }
