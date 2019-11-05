@@ -3,6 +3,7 @@ package net.tnemc.commands.core;
 import net.tnemc.commands.core.utils.CommandTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.Plugin;
@@ -49,12 +50,14 @@ public class CommandManager {
   /**
    * Used to translate a configuration node into a list of Strings with the {@link CommandTranslator}.
    * @param message The message to translate.
+   * @param sender An optional containing the CommandSender that caused the translation call, or an
+   * empty Optional if no CommandSender was involved.
    * @param defaultMessage The default message if the message isn't translated.
    * @return The translated output when possible, otherwise the default message.
    */
-  public List<String> translate(String message, List<String> defaultMessage) {
+  public List<String> translate(String message, Optional<CommandSender> sender, List<String> defaultMessage) {
     if(translator != null) {
-      final Optional<List<String>> translated = translator.translateToList(message);
+      final Optional<List<String>> translated = translator.translateToList(message, sender);
 
       if(translated.isPresent()) return translated.get();
     }
@@ -64,12 +67,14 @@ public class CommandManager {
   /**
    * Used to translate a String with the {@link CommandTranslator}.
    * @param message The message to translate.
+   * @param sender An optional containing the CommandSender that caused the translation call, or an
+   * empty Optional if no CommandSender was involved.
    * @param defaultMessage The default message if the message isn't translated.
    * @return The translated output when possible, otherwise the default message.
    */
-  public String translate(String message, String defaultMessage) {
+  public String translate(String message, Optional<CommandSender> sender, String defaultMessage) {
     if(translator != null) {
-      final Optional<String> translated = translator.translateText(message);
+      final Optional<String> translated = translator.translateText(message, sender);
 
       if(translated.isPresent()) return translated.get();
     }

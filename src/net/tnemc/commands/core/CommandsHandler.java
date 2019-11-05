@@ -173,29 +173,34 @@ public class CommandsHandler {
       if(manager.getExecutors().containsKey(information.get().getExecutor())) {
 
         if(!player && !information.get().isConsole()) {
-          sender.sendMessage(manager.translate("Messages.Command.Console", ColourFormatter.format(MessageSettings.console, false)));
+          sender.sendMessage(manager.translate("Messages.Command.Console", Optional.of(sender), ColourFormatter.format(MessageSettings.console, false)));
           return false;
         }
 
         if(player && !information.get().isPlayer()) {
-          sender.sendMessage(manager.translate("Messages.Command.Player", ColourFormatter.format(MessageSettings.player, false)));
+          sender.sendMessage(manager.translate("Messages.Command.Player", Optional.of(sender), ColourFormatter.format(MessageSettings.player, false)));
           return false;
         }
 
         if(!information.get().isDeveloper() && !manager.getExecutors().get(information.get().getExecutor()).canExecute(information.get(), sender)) {
-          sender.sendMessage(manager.translate("Messages.Command.InvalidPermission", ColourFormatter.format(MessageSettings.invalidPermission, false)));
+          sender.sendMessage(manager.translate("Messages.Command.InvalidPermission", Optional.of(sender), ColourFormatter.format(MessageSettings.invalidPermission, false)));
           return false;
         }
 
         if(information.get().isDeveloper()) {
           if(!player || !developers.contains(((Player)sender).getUniqueId().toString())) {
-            sender.sendMessage(manager.translate("Messages.Command.Developer", ColourFormatter.format(MessageSettings.developer, false)));
+            sender.sendMessage(manager.translate("Messages.Command.Developer", Optional.of(sender), ColourFormatter.format(MessageSettings.developer, false)));
             return false;
           }
         }
 
         if(search.get().getInformation().get().getRequiredArguments() > arguments.length) {
-          sender.sendMessage(ColourFormatter.format(search.get().getInformation().get().getHelp(), false));
+          sender.sendMessage(
+              ColourFormatter.format(
+                  manager.translate("Messages.Command." + search.get().getInformation().get().buildCommandNode(sender, true),
+                                    Optional.of(sender),
+                                    search.get().getInformation().get().buildHelp(sender)),
+                  false));
           return false;
         }
 
@@ -206,7 +211,7 @@ public class CommandsHandler {
 
             final Optional<ParameterType> type = ParameterType.find(param.getType());
             if(type.isPresent() && !type.get().getValidator().valid(param.getRegex(), arguments[i])) {
-              sender.sendMessage(manager.translate("Messages.Parameter.InvalidType", ColourFormatter.format(MessageSettings.invalidType
+              sender.sendMessage(manager.translate("Messages.Parameter.InvalidType", Optional.of(sender), ColourFormatter.format(MessageSettings.invalidType
                                                                                   .replace("$parameter", param.getName())
                                                                                   .replace("$parameter_type", param.getType()), false)));
               return false;
@@ -215,7 +220,7 @@ public class CommandsHandler {
             if(type.isPresent() && type.get().getName().equalsIgnoreCase("string")
                 && param.getMaxLength() > 0) {
               if(arguments[i].length() > param.getMaxLength()) {
-                sender.sendMessage(manager.translate("Messages.Parameter.InvalidLength", ColourFormatter.format(MessageSettings.invalidLength
+                sender.sendMessage(manager.translate("Messages.Parameter.InvalidLength", Optional.of(sender), ColourFormatter.format(MessageSettings.invalidLength
                                                                                                                   .replace("$parameter", param.getName())
                                                                                                                   .replace("$parameter_type", param.getType()), false)));
                 return false;

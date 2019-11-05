@@ -1,5 +1,7 @@
 package net.tnemc.commands.core.utils;
 
+import org.bukkit.command.CommandSender;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -11,10 +13,12 @@ public interface CommandTranslator {
    * passed the configuration nodes in Example.Node.OtherNode format which should
    * then be used by your translator to return a translated String.
    * @param text The configuration node to translate.
+   * @param sender An optional containing the CommandSender that caused the translation call, or an
+   * empty Optional if no CommandSender was involved.
    * @return An optional with the translated String list, or Optional.empty() if you
    * don't wish to translate it.
    */
-  default Optional<List<String>> translateToList(String text) {
+  default Optional<List<String>> translateToList(String text, Optional<CommandSender> sender) {
     return Optional.empty();
   }
 
@@ -23,8 +27,10 @@ public interface CommandTranslator {
    * passed the configuration nodes in Example.Node.OtherNode format which should
    * then be used by your translator to return a translated String.
    * @param text The configuration node to translate.
+   * @param sender An optional containing the CommandSender that caused the translation call, or an
+   * empty Optional if no CommandSender was involved.
    * @return An optional with the translated String, or Optional.empty() if you
    * don't wish to translate it.
    */
-  Optional<String> translateText(String text);
+  Optional<String> translateText(String text, Optional<CommandSender> sender);
 }

@@ -2,6 +2,7 @@ package net.tnemc.commands.core;
 
 import net.tnemc.commands.core.parameter.CommandParameter;
 import net.tnemc.commands.core.settings.MessageSettings;
+import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -188,16 +189,16 @@ public class CommandInformation {
     this.requiredArguments = requiredArguments;
   }
 
-  public void buildHelp() {
-    String help = CommandsHandler.manager().translate("Messages.Command.CommandHelp", MessageSettings.commandHelp);
-    help = help.replace("$command", buildCommand());
+  public String buildHelp(CommandSender sender) {
+    String help = CommandsHandler.manager().translate("Messages.Command.CommandHelp", Optional.of(sender), MessageSettings.commandHelp);
+    help = help.replace("$command", buildCommand(sender));
     help = help.replace("$description", description);
-    help = help.replace("$parameters", buildParameters());
+    help = help.replace("$parameters", buildParameters(sender));
 
-    this.help = help;
+    return help;
   }
 
-  public String buildCommand() {
+  public String buildCommand(CommandSender sender) {
     StringBuilder builder = new StringBuilder();
 
     CommandInformation information = this;
@@ -220,20 +221,45 @@ public class CommandInformation {
     return builder.toString();
   }
 
-  public String buildParameters() {
+  public String buildCommandNode(CommandSender sender, boolean camelCase) {
+    StringBuilder builder = new StringBuilder();
+
+    CommandInformation information = this;
+
+    while(information.isSubCommand()) {
+      information = information.parent;
+
+      String append = capitalizeCommand(information.name, camelCase);
+
+      if(builder.length() > 0) append += " ";
+
+      builder.insert(0, append);
+    }
+
+    String append = capitalizeCommand(information.name, camelCase);
+    if(builder.length() > 0) append += " ";
+
+    builder.insert(0, append);
+
+    return builder.toString();
+  }
+
+  private String capitalizeCommand(String name, boolean camelCase) {
+    if(!camelCase) return name.toLowerCase();
+
+    return name.substring(0, 1).toUpperCase() + name.substring(1);
+  }
+
+  public String buildParameters(CommandSender sender) {
     StringBuilder builder = new StringBuilder();
 
     for(CommandParameter param : parameters.values()) {
       if(builder.length() > 0) builder.append(" ");
-      final String paramStr = (param.isOptional())? CommandsHandler.manager().translate("Messages.Parameter.ParameterOption", MessageSettings.parameterOption) :
-          CommandsHandler.manager().translate("Messages.Parameter.ParameterRequired", MessageSettings.parameterRequired);
+      final String paramStr = (param.isOptional())? CommandsHandler.manager().translate("Messages.Parameter.ParameterOption", Optional.of(sender), MessageSettings.parameterOption) :
+          CommandsHandler.manager().translate("Messages.Parameter.ParameterRequired", Optional.of(sender), MessageSettings.parameterRequired);
       builder.append(paramStr.replace("$parameter", param.getName().toLowerCase()));
     }
     return builder.toString();
-  }
-
-  public String getHelp() {
-    return help;
   }
 
   public List<String> getIdentifiers() {
