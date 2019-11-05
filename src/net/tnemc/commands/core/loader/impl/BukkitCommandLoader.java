@@ -11,6 +11,7 @@ import net.tnemc.commands.core.settings.MessageSettings;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Set;
 
 public class BukkitCommandLoader implements CommandLoader {
@@ -98,13 +99,13 @@ public class BukkitCommandLoader implements CommandLoader {
 
     commandInfo.setParent(parent);
 
-    commandInfo.setAliases(CommandsHandler.manager().translate(base + ".Alias", config.getStringList(base + ".Alias")));
+    commandInfo.setAliases(CommandsHandler.manager().translate(base + ".Alias", Optional.empty(), config.getStringList(base + ".Alias")));
     commandInfo.setAuthor(config.getString(base + ".Author", "Magic"));
     commandInfo.setPermission(config.getString(base + ".Permission", ""));
     commandInfo.setConsole(config.getBoolean(base + ".Console", true));
     commandInfo.setPlayer(config.getBoolean(base + ".Player", true));
     commandInfo.setDeveloper(config.getBoolean(base + ".Developer", false));
-    commandInfo.setDescription(CommandsHandler.manager().translate(base + ".Description", config.getString(base + ".Description", "No description provided.")));
+    commandInfo.setDescription(CommandsHandler.manager().translate(base + ".Description", Optional.empty(), config.getString(base + ".Description", "No description provided.")));
     commandInfo.setExecutor(config.getString(base + ".Executor", "hello_exe"));
 
     if(config.contains(base + ".Short")) {
@@ -120,7 +121,6 @@ public class BukkitCommandLoader implements CommandLoader {
         commandInfo.addSub(loadCommand(subName, base + ".Sub." + subName, commandInfo));
       }
     }
-    commandInfo.buildHelp();
     return commandInfo;
   }
 

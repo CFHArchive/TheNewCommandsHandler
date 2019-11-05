@@ -12,6 +12,7 @@ import net.tnemc.config.CommentedConfiguration;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Set;
 
 public class CuttlefishCommandLoader implements CommandLoader {
@@ -107,13 +108,13 @@ public class CuttlefishCommandLoader implements CommandLoader {
 
     commandInfo.setParent(parent);
 
-    commandInfo.setAliases(CommandsHandler.manager().translate(base + ".Alias", config.getStringList(base + ".Alias")));
+    commandInfo.setAliases(CommandsHandler.manager().translate(base + ".Alias", Optional.empty(), config.getStringList(base + ".Alias")));
     commandInfo.setAuthor(config.getString(base + ".Author", "Magic"));
     commandInfo.setPermission(config.getString(base + ".Permission", ""));
     commandInfo.setConsole(config.getBool(base + ".Console", true));
     commandInfo.setPlayer(config.getBool(base + ".Player", true));
     commandInfo.setDeveloper(config.getBool(base + ".Developer", false));
-    commandInfo.setDescription(CommandsHandler.manager().translate(base + ".Description", config.getString(base + ".Description", "No description provided.")));
+    commandInfo.setDescription(CommandsHandler.manager().translate(base + ".Description", Optional.empty(), config.getString(base + ".Description", "No description provided.")));
     commandInfo.setExecutor(config.getString(base + ".Executor", "hello_exe"));
 
     if(config.contains(base + ".Short")) {
@@ -129,7 +130,6 @@ public class CuttlefishCommandLoader implements CommandLoader {
         commandInfo.addSub(loadCommand(subName, base + ".Sub." + subName, commandInfo));
       }
     }
-    commandInfo.buildHelp();
     return commandInfo;
   }
 
