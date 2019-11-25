@@ -40,6 +40,9 @@ public class BukkitCommandLoader implements CommandLoader {
     MessageSettings.commandHelp = config.getString("Messages.Command.CommandHelp",
                                                    "Correct usage: /$command $parameters - $description");
 
+    MessageSettings.cooldown = config.getString("Messages.Command.Cooldown",
+                                                "<red>This command is on cooldown.");
+
     MessageSettings.developer = config.getString("Messages.Command.Developer",
                                                    "<red>You must be a developer to use that command.");
 
@@ -105,6 +108,7 @@ public class BukkitCommandLoader implements CommandLoader {
     commandInfo.setConsole(config.getBoolean(base + ".Console", true));
     commandInfo.setPlayer(config.getBoolean(base + ".Player", true));
     commandInfo.setDeveloper(config.getBoolean(base + ".Developer", false));
+    commandInfo.setCooldown(config.getLong(base + ".Cooldown", 0));
     commandInfo.setDescription(CommandsHandler.manager().translate(base + ".Description", Optional.empty(), config.getString(base + ".Description", "No description provided.")));
     commandInfo.setExecutor(config.getString(base + ".Executor", "hello_exe"));
 

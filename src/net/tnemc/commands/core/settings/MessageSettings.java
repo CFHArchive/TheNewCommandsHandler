@@ -8,6 +8,7 @@ public class MessageSettings {
   public static String parameterRequired = "";
 
   public static String commandHelp = "";
+  public static String cooldown = "";
   public static String developer = "";
   public static String console = "";
   public static String player = "";

@@ -56,6 +56,8 @@ public class CommandInformation {
   private boolean player;
   private boolean developer;
 
+  private long cooldown = 0;
+
   public CommandInformation(String name) {
     this.name = name;
   }
@@ -389,6 +391,18 @@ public class CommandInformation {
 
   public void setDeveloper(boolean developer) {
     this.developer = developer;
+  }
+
+  public long getCooldown() {
+    return cooldown;
+  }
+
+  public boolean hasCooldown() {
+    return cooldown > 0;
+  }
+
+  public void setCooldown(long cooldown) {
+    this.cooldown = cooldown;
   }
 
   public void addParameters(LinkedList<CommandParameter> parameters) {

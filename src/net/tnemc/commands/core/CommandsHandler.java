@@ -2,6 +2,7 @@ package net.tnemc.commands.core;
 
 import net.tnemc.commands.core.completer.impl.PlayerCompleter;
 import net.tnemc.commands.core.completer.impl.SubCompleter;
+import net.tnemc.commands.core.cooldown.CooldownHandler;
 import net.tnemc.commands.core.loader.CommandLoader;
 import net.tnemc.commands.core.loader.impl.BukkitCommandLoader;
 import net.tnemc.commands.core.loader.impl.CuttlefishCommandLoader;
@@ -35,6 +36,7 @@ public class CommandsHandler {
 
   private CommandManager manager;
   private CommandLoader loader;
+  private CooldownHandler cooldownHandler;
 
   private static CommandsHandler instance;
 
@@ -172,6 +174,11 @@ public class CommandsHandler {
 
       if(manager.getExecutors().containsKey(information.get().getExecutor())) {
 
+        if(player && cooldownHandler.hasCooldown(((Player)sender).getUniqueId(), search.get().getInformation().get().getName())) {
+          sender.sendMessage(manager.translate("Messages.Command.Cooldown", Optional.of(sender), ColourFormatter.format(MessageSettings.cooldown, false)));
+          return false;
+        }
+
         if(!player && !information.get().isConsole()) {
           sender.sendMessage(manager.translate("Messages.Command.Console", Optional.of(sender), ColourFormatter.format(MessageSettings.console, false)));
           return false;
@@ -229,7 +236,12 @@ public class CommandsHandler {
           }
         }
 
-        return manager.getExecutors().get(information.get().getExecutor()).execute(sender, command, label, arguments);
+        final boolean completed = manager.getExecutors().get(information.get().getExecutor()).execute(sender, command, label, arguments);
+
+        if(completed && player && search.get().getInformation().get().getCooldown() > 0) {
+          cooldownHandler.addCooldown(manager.plugin, ((Player)sender).getUniqueId(), search.get().getInformation().get().getName(), search.get().getInformation().get().getCooldown());
+        }
+        return completed;
       }
     }
     return false;
@@ -283,6 +295,11 @@ public class CommandsHandler {
     return this;
   }
 
+  public CommandsHandler withCooldown(CooldownHandler cooldown) {
+    this.cooldownHandler = cooldown;
+    return this;
+  }
+
   /**
    * Used to add a new {@link CommandExecution executor} to TNCH.
    * @param name The name of the command executor
@@ -298,6 +315,14 @@ public class CommandsHandler {
 
   public static CommandsHandler instance() {
     return instance;
+  }
+
+  public CooldownHandler getCooldownHandler() {
+    return cooldownHandler;
+  }
+
+  public void setCooldownHandler(CooldownHandler cooldownHandler) {
+    this.cooldownHandler = cooldownHandler;
   }
 
   public List<String> getDevelopers() {

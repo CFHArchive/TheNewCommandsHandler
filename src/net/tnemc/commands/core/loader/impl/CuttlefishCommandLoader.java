@@ -46,6 +46,10 @@ public class CuttlefishCommandLoader implements CommandLoader {
                                                    "Correct usage: /$command $parameters - $description"
     );
 
+    MessageSettings.cooldown = config.getString("Messages.Command.Cooldown",
+                                                   "<red>This command is on cooldown."
+    );
+
     MessageSettings.developer = config.getString("Messages.Command.Developer",
                                                  "<red>You must be a developer to use that command."
     );
@@ -114,6 +118,7 @@ public class CuttlefishCommandLoader implements CommandLoader {
     commandInfo.setConsole(config.getBool(base + ".Console", true));
     commandInfo.setPlayer(config.getBool(base + ".Player", true));
     commandInfo.setDeveloper(config.getBool(base + ".Developer", false));
+    commandInfo.setCooldown(config.getInt(base + ".Cooldown", 0));
     commandInfo.setDescription(CommandsHandler.manager().translate(base + ".Description", Optional.empty(), config.getString(base + ".Description", "No description provided.")));
     commandInfo.setExecutor(config.getString(base + ".Executor", "hello_exe"));
 
