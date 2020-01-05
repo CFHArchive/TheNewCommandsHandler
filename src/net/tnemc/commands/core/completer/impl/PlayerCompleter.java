@@ -12,6 +12,7 @@ public class PlayerCompleter extends ConfigCompleter {
   public PlayerCompleter() {
 
     super((sender, search, argument)->{
+
       final CommandInformation information = search.get().getInformation().get();
 
       LinkedList<String> players = new LinkedList<>();
