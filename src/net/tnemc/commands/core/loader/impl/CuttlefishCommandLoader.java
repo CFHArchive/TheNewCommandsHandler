@@ -21,6 +21,15 @@ public class CuttlefishCommandLoader implements CommandLoader {
 
   public CuttlefishCommandLoader(CommentedConfiguration config) {
     this.config = config;
+    System.out.println("Account Keys: " + String.join(", ", config.getSection("Commands.account.Sub").getKeys(false)));
+    System.out.println("Account Keys: " + String.join(", ", config.getSection("Commands.language.Sub").getKeys(false)));
+    System.out.println("Pin Keys: " + config.contains("Commands.account.Sub.pin.Sub.set"));
+    System.out.println("Pin Keys: " + config.contains("Commands.account.Sub.pin.Sub"));
+    System.out.println("Pin Keys: " + String.join(", ", config.getSection("Commands.account.Sub.pin.Sub").getKeys(false)));
+    System.out.println("Pin Keys: " + config.getString("Commands.account.Sub.pin.Sub.set.Description"));
+    System.out.println("Pin Keys: " + String.join(", ", config.getSection("Commands.account.Sub.pin.Sub.set").getKeys(false)));
+    System.out.println("Pin Keys: " + String.join(", ", config.getSection("Commands.account.Sub.pin").getKeys(true)));
+    System.out.println("Commands Keys: " + String.join(", ", config.getSection("Commands").getKeys(false)));
   }
 
   public void loadMessages() {
@@ -107,7 +116,10 @@ public class CuttlefishCommandLoader implements CommandLoader {
     }
   }
 
-  public CommandInformation loadCommand(String name, String base, CommandInformation parent) {
+  public CommandInformation loadCommand(String name, final String base, CommandInformation parent) {
+    System.out.println("Test: " + String.join(", ", config.getSection("Commands.account.Sub.pin.Sub").getKeys(false)));
+    System.out.println("loadCommand: " + name);
+    System.out.println("loadCommand(base): " + base);
     CommandInformation commandInfo = new CommandInformation(name);
 
     commandInfo.setParent(parent);
@@ -122,24 +134,38 @@ public class CuttlefishCommandLoader implements CommandLoader {
     commandInfo.setDescription(CommandsHandler.manager().translate(base + ".Description", Optional.empty(), config.getString(base + ".Description", "No description provided.")));
     commandInfo.setExecutor(config.getString(base + ".Executor", "hello_exe"));
 
+
     if(config.contains(base + ".Short")) {
       commandInfo.setSubShort(config.getStringList(base + ".Short"));
     }
 
+    System.out.println(commandInfo.toString());
+
     commandInfo.addParameters(loadParameters(name, base));
+    System.out.println("Base Node: " + base);
 
-    if(config.contains(base + ".Sub")) {
-      final Set<String> sub = config.getSection(base + ".Sub").getKeys(false);
+    final String subDestination = base + ".Sub";
+    System.out.println("Contains: " + config.contains(subDestination));
+    if(config.contains(subDestination)) {
+      Set<String> sub = config.getSection(subDestination).getKeys(false);
+      System.out.println("Base Node: " + subDestination);
+      System.out.println("Subs: " + String.join(",", sub));
+      System.out.println("Subs 2: " + String.join(",", config.getSection(subDestination + ".Sub").getKeys(false)));
 
-      for(String subName : sub) {
-        commandInfo.addSub(loadCommand(subName, base + ".Sub." + subName, commandInfo));
+      for(String subName : config.getSection(subDestination).getKeys(false)) {
+        System.out.println("Sub - " + subName);
+        final String subBase = base + ".Sub." + subName;
+        System.out.println("SubBase: " + subBase);
+        commandInfo.addSub(loadCommand(subName, subBase, commandInfo));
       }
     }
     return commandInfo;
   }
 
   @Override
-  public LinkedList<CommandParameter> loadParameters(String command, String configBase) {
+  public LinkedList<CommandParameter> loadParameters(String command, final String configBase) {
+    System.out.println("loadParameters(command): " + command);
+    System.out.println("loadParameters(base): " + configBase);
     LinkedList<CommandParameter> parameters = new LinkedList<>();
 
     if(config.contains(configBase + ".Params")) {
@@ -147,6 +173,8 @@ public class CuttlefishCommandLoader implements CommandLoader {
       final LinkedHashSet<String> params = config.getSection(configBase + ".Params").getKeysLinked(false);
 
       for(String parameter : params) {
+
+        System.out.println("Parameter load: " + parameter);
 
         final String paramBase = configBase + ".Params." + parameter;
         CommandParameter param = new CommandParameter(parameter.toLowerCase());

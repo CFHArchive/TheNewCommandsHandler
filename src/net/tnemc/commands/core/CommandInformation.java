@@ -3,10 +3,12 @@ package net.tnemc.commands.core;
 import net.tnemc.commands.core.parameter.CommandParameter;
 import net.tnemc.commands.core.settings.MessageSettings;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -196,6 +198,60 @@ public class CommandInformation {
     help = help.replace("$command", buildCommand(sender));
     help = help.replace("$description", description);
     help = help.replace("$parameters", buildParameters(sender));
+
+    return CommandsHandler.manager().translate(help, Optional.of(sender), help);
+  }
+
+  public LinkedHashSet<String> buildHelpSub(CommandSender sender, int page) {
+    LinkedHashSet<String> help = new LinkedHashSet<>();
+
+    final int linesPerPage = (sender instanceof Player)? CommandsHandler.instance().getHelpLength() : 40;
+
+    int possible = 0;
+
+    for(CommandInformation info : sub.values()) {
+      if(CommandsHandler.manager().getExecutors().get(info.getExecutor()).canExecute(info, sender)) {
+        possible ++;
+      }
+    }
+
+    int max = possible / linesPerPage;
+    if(possible % linesPerPage > 0) max++;
+
+    int min = page * (linesPerPage - 1);
+    if(min > sub.size()) min = 0;
+    int remaining = linesPerPage;
+    int index = min;
+
+
+
+    if(sub.size() > 0) {
+      String formatted = name.substring(0, 1).toUpperCase() + name.substring(1);
+
+      String header = CommandsHandler.manager().translate("Messages.Command.CommandHelpHeader", Optional.of(sender), MessageSettings.commandHelpHeader);
+      header = header.replace("$command", formatted);
+      header = header.replace("$page", page + "");
+      header = header.replace("$max", max + "");
+      help.add(header);
+    }
+
+    if (sub.size() > 0) {
+
+      while(remaining > 0) {
+        if(sub.size() <= index) break;
+        try {
+          help.add(sub.get(index).buildHelp(sender));
+        } catch(ArrayIndexOutOfBoundsException ignore) {
+          break;
+        }
+
+        index++;
+        remaining--;
+      }
+
+    } else {
+      help.add(buildHelp(sender));
+    }
 
     return help;
   }

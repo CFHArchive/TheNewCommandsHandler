@@ -40,6 +40,8 @@ public class CommandsHandler {
 
   private static CommandsHandler instance;
 
+  private int helpLength = 5;
+
   private List<String> developers = new ArrayList<>();
 
   public CommandsHandler(JavaPlugin plugin, FileConfiguration commandsFile) {
@@ -172,77 +174,100 @@ public class CommandsHandler {
       final Optional<CommandInformation> information = search.get().getInformation();
       arguments = search.get().getArguments();
 
-      if(manager.getExecutors().containsKey(information.get().getExecutor())) {
+      System.out.println("Contains Executor(" + information.get().getExecutor() + "): " +
+                             manager.getExecutors().containsKey(information.get().getExecutor()));
 
-        if(player && cooldownHandler.hasCooldown(((Player)sender).getUniqueId(), search.get().getInformation().get().getName())) {
+      if(arguments.length >= 1 && arguments[0].equalsIgnoreCase("help") ||
+         arguments.length >= 1 && arguments[0].equalsIgnoreCase("?") ||
+         !manager.getExecutors().containsKey(information.get().getExecutor())) {
+
+        int page = 0;
+        if(arguments.length > 1) {
+          try {
+            page = Integer.parseInt(arguments[1]);
+          } catch(Exception ignore) { }
+        }
+
+        if(information.get().getSub().size() > 0) {
+          for(String str : information.get().buildHelpSub(sender, page)) {
+            sender.sendMessage(str);
+          }
+          return false;
+        }
+        sender.sendMessage(information.get().buildHelp(sender));
+        return false;
+      }
+
+      if(player) {
+        if(cooldownHandler != null && cooldownHandler.hasCooldown(((Player)sender).getUniqueId(), search.get().getInformation().get().getName())) {
           sender.sendMessage(manager.translate("Messages.Command.Cooldown", Optional.of(sender), ColourFormatter.format(MessageSettings.cooldown, false)));
           return false;
         }
+      }
 
-        if(!player && !information.get().isConsole()) {
-          sender.sendMessage(manager.translate("Messages.Command.Console", Optional.of(sender), ColourFormatter.format(MessageSettings.console, false)));
+      if(!player && !information.get().isConsole()) {
+        sender.sendMessage(manager.translate("Messages.Command.Console", Optional.of(sender), ColourFormatter.format(MessageSettings.console, false)));
+        return false;
+      }
+
+      if(player && !information.get().isPlayer()) {
+        sender.sendMessage(manager.translate("Messages.Command.Player", Optional.of(sender), ColourFormatter.format(MessageSettings.player, false)));
+        return false;
+      }
+
+      if(!information.get().isDeveloper() && !manager.getExecutors().get(information.get().getExecutor()).canExecute(information.get(), sender)) {
+        sender.sendMessage(manager.translate("Messages.Command.InvalidPermission", Optional.of(sender), ColourFormatter.format(MessageSettings.invalidPermission, false)));
+        return false;
+      }
+
+      if(information.get().isDeveloper()) {
+        if(!player || !developers.contains(((Player)sender).getUniqueId().toString())) {
+          sender.sendMessage(manager.translate("Messages.Command.Developer", Optional.of(sender), ColourFormatter.format(MessageSettings.developer, false)));
           return false;
         }
+      }
 
-        if(player && !information.get().isPlayer()) {
-          sender.sendMessage(manager.translate("Messages.Command.Player", Optional.of(sender), ColourFormatter.format(MessageSettings.player, false)));
-          return false;
-        }
+      if(search.get().getInformation().get().getRequiredArguments() > arguments.length) {
+        sender.sendMessage(
+            ColourFormatter.format(
+                manager.translate("Messages.Command." + search.get().getInformation().get().buildCommandNode(sender, true),
+                                  Optional.of(sender),
+                                  search.get().getInformation().get().buildHelp(sender)),
+                false));
+        return false;
+      }
 
-        if(!information.get().isDeveloper() && !manager.getExecutors().get(information.get().getExecutor()).canExecute(information.get(), sender)) {
-          sender.sendMessage(manager.translate("Messages.Command.InvalidPermission", Optional.of(sender), ColourFormatter.format(MessageSettings.invalidPermission, false)));
-          return false;
-        }
+      for(int i = 0; i < arguments.length; i++) {
+        final CommandParameter param = search.get().getInformation().get().getParameters().get(i);
 
-        if(information.get().isDeveloper()) {
-          if(!player || !developers.contains(((Player)sender).getUniqueId().toString())) {
-            sender.sendMessage(manager.translate("Messages.Command.Developer", Optional.of(sender), ColourFormatter.format(MessageSettings.developer, false)));
+        if(param != null) {
+
+          final Optional<ParameterType> type = ParameterType.find(param.getType());
+          if(type.isPresent() && !type.get().getValidator().valid(param.getRegex(), arguments[i])) {
+            sender.sendMessage(manager.translate("Messages.Parameter.InvalidType", Optional.of(sender), ColourFormatter.format(MessageSettings.invalidType
+                                                                                                                                   .replace("$parameter", param.getName())
+                                                                                                                                   .replace("$parameter_type", param.getType()), false)));
             return false;
           }
-        }
 
-        if(search.get().getInformation().get().getRequiredArguments() > arguments.length) {
-          sender.sendMessage(
-              ColourFormatter.format(
-                  manager.translate("Messages.Command." + search.get().getInformation().get().buildCommandNode(sender, true),
-                                    Optional.of(sender),
-                                    search.get().getInformation().get().buildHelp(sender)),
-                  false));
-          return false;
-        }
-
-        for(int i = 0; i < arguments.length; i++) {
-          final CommandParameter param = search.get().getInformation().get().getParameters().get(i);
-
-          if(param != null) {
-
-            final Optional<ParameterType> type = ParameterType.find(param.getType());
-            if(type.isPresent() && !type.get().getValidator().valid(param.getRegex(), arguments[i])) {
-              sender.sendMessage(manager.translate("Messages.Parameter.InvalidType", Optional.of(sender), ColourFormatter.format(MessageSettings.invalidType
-                                                                                  .replace("$parameter", param.getName())
-                                                                                  .replace("$parameter_type", param.getType()), false)));
+          if(type.isPresent() && type.get().getName().equalsIgnoreCase("string")
+              && param.getMaxLength() > 0) {
+            if(arguments[i].length() > param.getMaxLength()) {
+              sender.sendMessage(manager.translate("Messages.Parameter.InvalidLength", Optional.of(sender), ColourFormatter.format(MessageSettings.invalidLength
+                                                                                                                                       .replace("$parameter", param.getName())
+                                                                                                                                       .replace("$parameter_type", param.getType()), false)));
               return false;
-            }
-
-            if(type.isPresent() && type.get().getName().equalsIgnoreCase("string")
-                && param.getMaxLength() > 0) {
-              if(arguments[i].length() > param.getMaxLength()) {
-                sender.sendMessage(manager.translate("Messages.Parameter.InvalidLength", Optional.of(sender), ColourFormatter.format(MessageSettings.invalidLength
-                                                                                                                  .replace("$parameter", param.getName())
-                                                                                                                  .replace("$parameter_type", param.getType()), false)));
-                return false;
-              }
             }
           }
         }
-
-        final boolean completed = manager.getExecutors().get(information.get().getExecutor()).execute(sender, command, label, arguments);
-
-        if(completed && player && search.get().getInformation().get().getCooldown() > 0) {
-          cooldownHandler.addCooldown(manager.plugin, ((Player)sender).getUniqueId(), search.get().getInformation().get().getName(), search.get().getInformation().get().getCooldown());
-        }
-        return completed;
       }
+
+      final boolean completed = manager.getExecutors().get(information.get().getExecutor()).execute(sender, command, label, arguments);
+
+      if(completed && player && search.get().getInformation().get().getCooldown() > 0) {
+        cooldownHandler.addCooldown(manager.plugin, ((Player)sender).getUniqueId(), search.get().getInformation().get().getName(), search.get().getInformation().get().getCooldown());
+      }
+      return completed;
     }
     return false;
   }
@@ -331,5 +356,13 @@ public class CommandsHandler {
 
   public void setDevelopers(List<String> developers) {
     this.developers = developers;
+  }
+
+  public int getHelpLength() {
+    return helpLength;
+  }
+
+  public void setHelpLength(int helpLength) {
+    this.helpLength = helpLength;
   }
 }

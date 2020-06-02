@@ -81,7 +81,7 @@ public class CommandManager {
     return defaultMessage;
   }
 
-  private Optional<CommandInformation> find(String name) {
+  public Optional<CommandInformation> find(String name) {
 
     Iterator<Map.Entry<List<String>, CommandInformation>> it = commands.entrySet().iterator();
 
