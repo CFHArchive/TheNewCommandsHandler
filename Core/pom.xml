@@ -1,164 +1,42 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.tnemc</groupId>
     <artifactId>TNCH-Core</artifactId>
-    <version>0.1.10.1</version>
-    <packaging>jar</packaging>
     <name>The New Commands Handler Core</name>
-    <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.javadoc.plugin.version>3.0.1</maven.javadoc.plugin.version>
-        <maven.source.version>3.0.1</maven.source.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+
+    <parent>
+        <groupId>net.tnemc</groupId>
+        <artifactId>TNCH</artifactId>
+        <version>0.1.11.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
     <build>
         <directory>../target</directory>
         <outputDirectory>../target/classes</outputDirectory>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <testOutputDirectory>target/test-classes</testOutputDirectory>
         <sourceDirectory>/src</sourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven.source.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Create javadoc for help -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven.javadoc.plugin.version}</version>
-                <configuration>
-                    <source>8</source>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <!-- Disable doclint checks to build it under java 8 javadoc -->
-                        <configuration>
-                            <additionalJOptions>-Xdoclint:none</additionalJOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- GPG signing config -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
-    <organization>
-        <name>The New Economy</name>
-        <url>https://tnemc.net</url>
-    </organization>
-
-    <developers>
-        <developer>
-            <id>creatorfromhell</id>
-            <name>Daniel "creatorfromhell" Vidmar</name>
-            <email>daniel.viddy@gmail.com</email>
-            <url>https://creatorfromhell.com</url>
-            <organization>The New Economy</organization>
-            <organizationUrl>https://tnemc.net</organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>
-            <timezone>America/New_York</timezone>
-        </developer>
-    </developers>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
     <repositories>
-        <!--<repository>
+        <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>-->
-        <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/TheNewEconomy</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>net.tnemc</groupId>
-            <artifactId>TheNewConfigLibrary</artifactId>
-            <version>0.1.1.55</version>
-            <scope>compile</scope>
-        </dependency>
-        <!--<dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>1.14-pre5-SNAPSHOT</version>
             <scope>provided</scope>
-        </dependency>-->
+        </dependency>
+        <dependency>
+            <groupId>net.tnemc</groupId>
+            <artifactId>TNCH-Core</artifactId>
+            <version>0.1.11.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
