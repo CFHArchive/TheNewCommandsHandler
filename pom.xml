@@ -3,8 +3,12 @@
     <groupId>net.tnemc</groupId>
     <artifactId>TNCH</artifactId>
     <version>0.1.11.0</version>
-    <packaging>jar</packaging>
-    <name>The New Commands Handler Core</name>
+    <packaging>pom</packaging>
+    <name>The New Commands Handler</name>
+
+    <modules>
+        <module>Core</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -13,6 +17,7 @@
         <maven.source.version>3.0.1</maven.source.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <build>
         <directory>../target</directory>
         <outputDirectory>../target/classes</outputDirectory>
@@ -26,19 +31,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

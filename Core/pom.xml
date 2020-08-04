@@ -1,6 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>TNCH-Core</artifactId>
+    <packaging>jar</packaging>
     <name>The New Commands Handler Core</name>
 
     <parent>
@@ -17,26 +18,4 @@
         <testOutputDirectory>target/test-classes</testOutputDirectory>
         <sourceDirectory>/src</sourceDirectory>
     </build>
-
-    <repositories>
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-    </repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.14-pre5-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.tnemc</groupId>
-            <artifactId>TNCH-Core</artifactId>
-            <version>0.1.11.0</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
 </project>
