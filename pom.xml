@@ -8,6 +8,7 @@
 
     <modules>
         <module>Core</module>
+        <module>Bukkit</module>
     </modules>
 
     <properties>
@@ -101,12 +102,17 @@
 
     <repositories>
         <repository>
-            <id>codemc-snapshots</id>
-            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
-        </repository>
-        <repository>
             <id>codemc-releases</id>
-            <url>https://repo.codemc.io/repository/maven-releases/</url>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
         </repository>
     </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.tnemc</groupId>
+            <artifactId>TheNewConfigLibrary</artifactId>
+            <version>0.1.2.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
