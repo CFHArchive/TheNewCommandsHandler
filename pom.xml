@@ -8,7 +8,6 @@
 
     <modules>
         <module>Core</module>
-        <module>Bukkit</module>
     </modules>
 
     <properties>
