@@ -11,10 +11,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <build>
-        <defaultGoal>install</defaultGoal>
-    </build>
-
     <repositories>
         <repository>
             <id>spigot-repo</id>
