@@ -7,12 +7,12 @@
     <parent>
         <groupId>net.tnemc</groupId>
         <artifactId>TNCH</artifactId>
-        <version>0.1.11.0</version>
+        <version>0.1.12.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <build>
-        <defaultGoal>clean install</defaultGoal>
+        <defaultGoal>install</defaultGoal>
         <directory>../target</directory>
         <outputDirectory>../target/classes</outputDirectory>
         <finalName>${project.artifactId}-${project.version}</finalName>
