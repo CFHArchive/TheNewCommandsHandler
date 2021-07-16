@@ -99,7 +99,7 @@ public class CommandManager {
     Optional<CommandInformation> information = find(name);
 
     if(information.isPresent()) {
-      //System.out.println(information.get().toString());
+      ////System.out.println(information.get().toString());
       final CommandSearchInformation search = information.get().findSubInformation(arguments);
       return Optional.of(search);
     }
@@ -165,9 +165,9 @@ public class CommandManager {
 
           boolean remove = false;
           for (String str : entry.getKey()) {
-            //System.out.println("CommandManager.unregister(" + command + ")");
+            ////System.out.println("CommandManager.unregister(" + command + ")");
             if (str.equalsIgnoreCase(command)) {
-              //System.out.println("CommandManager.unregister(remove = true)");
+              ////System.out.println("CommandManager.unregister(remove = true)");
               remove = true;
             }
           }

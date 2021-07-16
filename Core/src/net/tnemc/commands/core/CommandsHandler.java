@@ -114,8 +114,8 @@ public class CommandsHandler {
       final Optional<CommandInformation> information = search.get().getInformation();
       arguments = search.get().getArguments();
 
-      System.out.println("Contains Executor(" + information.get().getExecutor() + "): " +
-                             manager.getExecutors().containsKey(information.get().getExecutor()));
+      //System.out.println("Contains Executor(" + information.get().getExecutor() + "): " +
+                             //manager.getExecutors().containsKey(information.get().getExecutor()));
 
       if(arguments.length >= 1 && arguments[0].equalsIgnoreCase("help") ||
          arguments.length >= 1 && arguments[0].equalsIgnoreCase("?") ||

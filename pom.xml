@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.tnemc</groupId>
     <artifactId>TNCH</artifactId>
-    <version>0.1.16.0</version>
+    <version>0.1.16.1</version>
     <packaging>pom</packaging>
     <name>The New Commands Handler</name>
 
