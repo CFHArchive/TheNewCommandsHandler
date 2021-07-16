@@ -236,10 +236,12 @@ public class CommandInformation {
 
     if (sub.size() > 0) {
 
+      List<CommandInformation> subInfo = new ArrayList<>(sub.values());
+
       while(remaining > 0) {
-        if(sub.size() <= index) break;
+        if(subInfo.size() <= index) break;
         try {
-          help.add(sub.get(index).buildHelp(sender));
+          help.add(subInfo.get(index).buildHelp(sender));
         } catch(ArrayIndexOutOfBoundsException ignore) {
           break;
         }
