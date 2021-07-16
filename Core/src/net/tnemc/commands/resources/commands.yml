@@ -12,17 +12,17 @@ Messages:
 
   Command:
 
-    Cooldown: "<red>This registration is on cooldown."
+    Cooldown: "<red>This command is on cooldown."
 
     CommandHelp: "Correct usage: /$registration $parameters - $description"
 
-    Developer: "<red>You must be a developer to use that registration."
+    Developer: "<red>You must be a developer to use that command."
 
-    Console: "<red>This registration is not usable from console."
+    Console: "<red>This command is not usable from console."
 
-    Player: "<red>This registration is not usable from in-game."
+    Player: "<red>This command is not usable from in-game."
 
-    InvalidPermission: "<red>I'm sorry, but you're not allowed to use that registration."
+    InvalidPermission: "<red>I'm sorry, but you're not allowed to use that command."
 
 #Place your net.tnemc.commands here
 Commands:

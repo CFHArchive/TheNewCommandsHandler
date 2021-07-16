@@ -194,8 +194,8 @@ public class CommandInformation {
 
   public String buildHelp(PlayerProvider sender) {
     String help = CommandsHandler.manager().translate("Messages.Command.CommandHelp", Optional.of(sender), MessageSettings.commandHelp);
-    help = help.replace("$registration", buildCommand(sender));
-    help = help.replace("$description", description);
+    help = help.replace("$command", buildCommand(sender));
+    help = help.replace("$description", CommandsHandler.manager().translate(description, Optional.of(sender), MessageSettings.commandHelp));
     help = help.replace("$parameters", buildParameters(sender));
 
     return CommandsHandler.manager().translate(help, Optional.of(sender), help);
@@ -228,7 +228,7 @@ public class CommandInformation {
       String formatted = name.substring(0, 1).toUpperCase() + name.substring(1);
 
       String header = CommandsHandler.manager().translate("Messages.Command.CommandHelpHeader", Optional.of(sender), MessageSettings.commandHelpHeader);
-      header = header.replace("$registration", formatted);
+      header = header.replace("$command", formatted);
       header = header.replace("$page", page + "");
       header = header.replace("$max", max + "");
       help.add(header);
@@ -263,13 +263,14 @@ public class CommandInformation {
     CommandInformation information = this;
 
     while(information.isSubCommand()) {
-      information = information.parent;
 
       String append = information.name.toLowerCase();
 
       if(builder.length() > 0) append += " ";
 
       builder.insert(0, append);
+
+      information = information.parent;
     }
 
     String append = information.name.toLowerCase();
