@@ -6,6 +6,7 @@ import net.tnemc.commands.core.settings.MessageSettings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -192,13 +193,13 @@ public class CommandInformation {
     this.requiredArguments = requiredArguments;
   }
 
-  public String buildHelp(PlayerProvider sender) {
+  public List<String> buildHelp(PlayerProvider sender) {
     String help = CommandsHandler.manager().translate("Messages.Command.CommandHelp", Optional.of(sender), MessageSettings.commandHelp);
     help = help.replace("$command", buildCommand(sender));
     help = help.replace("$description", CommandsHandler.manager().translate(description, Optional.of(sender), MessageSettings.commandHelp));
     help = help.replace("$parameters", buildParameters(sender));
 
-    return CommandsHandler.manager().translate(help, Optional.of(sender), help);
+    return CommandsHandler.manager().translate(help, Optional.of(sender), Collections.singletonList(help));
   }
 
   public LinkedHashSet<String> buildHelpSub(PlayerProvider sender, int page) {
@@ -229,7 +230,7 @@ public class CommandInformation {
 
       String header = CommandsHandler.manager().translate("Messages.Command.CommandHelpHeader", Optional.of(sender), MessageSettings.commandHelpHeader);
       header = header.replace("$command", formatted);
-      header = header.replace("$page", page + "");
+      header = header.replace("$page", Math.max(page, 1) + "");
       header = header.replace("$max", max + "");
       help.add(header);
     }
@@ -241,7 +242,7 @@ public class CommandInformation {
       while(remaining > 0) {
         if(subInfo.size() <= index) break;
         try {
-          help.add(subInfo.get(index).buildHelp(sender));
+          help.addAll(subInfo.get(index).buildHelp(sender));
         } catch(ArrayIndexOutOfBoundsException ignore) {
           break;
         }
@@ -251,7 +252,7 @@ public class CommandInformation {
       }
 
     } else {
-      help.add(buildHelp(sender));
+      help.addAll(buildHelp(sender));
     }
 
     return help;

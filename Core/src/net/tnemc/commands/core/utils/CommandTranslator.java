@@ -2,6 +2,7 @@ package net.tnemc.commands.core.utils;
 
 import net.tnemc.commands.core.provider.PlayerProvider;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,11 @@ public interface CommandTranslator {
    * don't wish to translate it.
    */
   default Optional<List<String>> translateToList(String text, Optional<PlayerProvider> sender) {
+    final Optional<String> translate = translateText(text, sender);
+
+    if(translate.isPresent()) {
+      return Optional.of(Collections.singletonList(translateText(text, sender).get()));
+    }
     return Optional.empty();
   }
 

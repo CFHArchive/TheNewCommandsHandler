@@ -134,7 +134,11 @@ public class CommandsHandler {
           }
           return false;
         }
-        sender.sendMessage(information.get().buildHelp(sender));
+        final List<String> messages = information.get().buildHelp(sender);
+
+        for(String message : messages) {
+          sender.sendMessage(provider().formatter().format(message,false));
+        }
         return false;
       }
 
@@ -168,12 +172,13 @@ public class CommandsHandler {
       }
 
       if(search.get().getInformation().get().getRequiredArguments() > arguments.length) {
-        sender.sendMessage(
-            provider().formatter().format(
-                manager.translate("Messages.Command." + search.get().getInformation().get().buildCommandNode(sender, true),
-                                  Optional.of(sender),
-                                  search.get().getInformation().get().buildHelp(sender)),
-                false));
+        final List<String> messages = manager.translate("Messages.Command." + search.get().getInformation().get().buildCommandNode(sender, true),
+                                                  Optional.of(sender),
+                                                  search.get().getInformation().get().buildHelp(sender));
+
+        for(String message : messages) {
+          sender.sendMessage(provider().formatter().format(message,false));
+        }
         return false;
       }
 
