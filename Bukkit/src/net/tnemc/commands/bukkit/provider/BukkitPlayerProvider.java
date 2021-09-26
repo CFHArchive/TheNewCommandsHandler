@@ -39,7 +39,9 @@ public class BukkitPlayerProvider implements PlayerProvider {
 
   @Override
   public void sendMessage(String message) {
-    sender.sendMessage(message);
+    if(!message.trim().equalsIgnoreCase("")) {
+      sender.sendMessage(message);
+    }
   }
 
   @Override
