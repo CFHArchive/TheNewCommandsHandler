@@ -7,6 +7,8 @@ import net.tnemc.commands.core.utils.CommandTranslator;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,6 +43,31 @@ public class CommandManager {
   }
 
   /**
+   * Used to translate a list of Strings into a list of Strings with the {@link CommandTranslator}.
+   * @param message The list of messages to translate.
+   * @param sender An optional containing the CommandSender that caused the translation call, or an
+   * empty Optional if no CommandSender was involved.
+   * @param defaultMessage The default message if the message isn't translated.
+   * @return The translated output when possible, otherwise the default message.
+   */
+  public LinkedList<String> translate(LinkedList<String> message, Optional<PlayerProvider> sender, LinkedList<String> defaultMessage) {
+    ////System.out.println("Translate: " + message);
+    if(translator != null) {
+
+      LinkedList<String> translated = new LinkedList<>();
+
+      for(String str : message) {
+        final Optional<String> trans = translator.translateText(str, sender);
+
+        trans.ifPresent(translated::add);
+      }
+      return translated;
+    }
+    ////System.out.println("Default: " + defaultMessage);
+    return defaultMessage;
+  }
+
+  /**
    * Used to translate a configuration node into a list of Strings with the {@link CommandTranslator}.
    * @param message The message to translate.
    * @param sender An optional containing the CommandSender that caused the translation call, or an
@@ -48,12 +75,28 @@ public class CommandManager {
    * @param defaultMessage The default message if the message isn't translated.
    * @return The translated output when possible, otherwise the default message.
    */
-  public List<String> translate(String message, Optional<PlayerProvider> sender, List<String> defaultMessage) {
+  public LinkedList<String> translate(String message, Optional<PlayerProvider> sender, LinkedList<String> defaultMessage) {
+    ////System.out.println("Translate: " + message);
     if(translator != null) {
-      final Optional<List<String>> translated = translator.translateToList(message, sender);
+      final Optional<LinkedList<String>> translated = translator.translateToList(message, sender);
 
-      if(translated.isPresent()) return translated.get();
+      if(translated.isPresent()) {
+        ////System.out.println("Translated: " + translated.get());
+
+
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+
+        ////System.out.println("========== STACK ==========");
+        ////System.out.println("String: " + stackTraceElements[0].toString());
+        ////System.out.println("String: " + stackTraceElements[1].toString());
+        ////System.out.println("String: " + stackTraceElements[2].toString());
+        ////System.out.println("String: " + stackTraceElements[3].toString());
+        ////System.out.println("========== END ==========");
+
+        return translated.get();
+      }
     }
+    ////System.out.println("Default: " + defaultMessage);
     return defaultMessage;
   }
 
@@ -66,11 +109,25 @@ public class CommandManager {
    * @return The translated output when possible, otherwise the default message.
    */
   public String translate(String message, Optional<PlayerProvider> sender, String defaultMessage) {
+    ////System.out.println("Translate: " + message);
     if(translator != null) {
       final Optional<String> translated = translator.translateText(message, sender);
 
-      if(translated.isPresent()) return translated.get();
+      if(translated.isPresent()) {
+
+
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+
+        ////System.out.println("========== STACK ==========");
+        for(StackTraceElement e : stackTraceElements) {
+          ////System.out.println("String: " + e.toString());
+        }
+        ////System.out.println("========== END ==========");
+        ////System.out.println("Translated: " + translated.get());
+        return translated.get();
+      }
     }
+    ////System.out.println("Default: " + defaultMessage);
     return defaultMessage;
   }
 
@@ -99,7 +156,7 @@ public class CommandManager {
     Optional<CommandInformation> information = find(name);
 
     if(information.isPresent()) {
-      ////System.out.println(information.get().toString());
+      ////////System.out.println(information.get().toString());
       final CommandSearchInformation search = information.get().findSubInformation(arguments);
       return Optional.of(search);
     }
@@ -165,9 +222,9 @@ public class CommandManager {
 
           boolean remove = false;
           for (String str : entry.getKey()) {
-            ////System.out.println("CommandManager.unregister(" + command + ")");
+            ////////System.out.println("CommandManager.unregister(" + command + ")");
             if (str.equalsIgnoreCase(command)) {
-              ////System.out.println("CommandManager.unregister(remove = true)");
+              ////////System.out.println("CommandManager.unregister(remove = true)");
               remove = true;
             }
           }

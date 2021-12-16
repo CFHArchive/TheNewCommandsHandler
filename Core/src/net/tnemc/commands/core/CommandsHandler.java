@@ -14,6 +14,8 @@ import net.tnemc.commands.core.utils.CommandTranslator;
 import net.tnemc.config.CommentedConfiguration;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,7 +116,7 @@ public class CommandsHandler {
       final Optional<CommandInformation> information = search.get().getInformation();
       arguments = search.get().getArguments();
 
-      //System.out.println("Contains Executor(" + information.get().getExecutor() + "): " +
+      //////System.out.println("Contains Executor(" + information.get().getExecutor() + "): " +
                              //manager.getExecutors().containsKey(information.get().getExecutor()));
 
       if(arguments.length >= 1 && arguments[0].equalsIgnoreCase("help") ||
@@ -134,7 +136,7 @@ public class CommandsHandler {
           }
           return false;
         }
-        final List<String> messages = information.get().buildHelp(sender);
+        final LinkedList<String> messages = information.get().buildHelp(sender);
 
         for(String message : messages) {
           sender.sendMessage(provider().formatter().format(message,false));
@@ -172,11 +174,13 @@ public class CommandsHandler {
       }
 
       if(search.get().getInformation().get().getRequiredArguments() > arguments.length) {
-        final List<String> messages = manager.translate("Messages.Command." + search.get().getInformation().get().buildCommandNode(sender, true),
+        final LinkedList<String> messages = manager.translate("Messages.Command." + search.get().getInformation().get().buildCommandNode(sender, true),
                                                   Optional.of(sender),
                                                   search.get().getInformation().get().buildHelp(sender));
 
-        for(String message : messages) {
+        final LinkedList<String> help = search.get().getInformation().get().buildHelp(sender);
+        for(String message : help) {
+          ////System.out.println("MSG: " + message);
           sender.sendMessage(provider().formatter().format(message,false));
         }
         return false;

@@ -52,10 +52,10 @@ public class BukkitCommandRegistrationProvider implements CommandRegistrationPro
 
       Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
       c.setAccessible(true);
-      ////System.out.println("CommandManager.register(" + command + ")");
+      ////////System.out.println("CommandManager.register(" + command + ")");
       PluginCommand pluginCommand = c.newInstance(command, plugin);
       if(pluginCommand != null) {
-        ////System.out.println("CommandManager.register(" + command + ")");
+        ////////System.out.println("CommandManager.register(" + command + ")");
         ((SimpleCommandMap) commandMap.get(Bukkit.getServer())).register(command, pluginCommand);
       }
     } catch(Exception ignore) {

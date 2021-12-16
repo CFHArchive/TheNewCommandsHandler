@@ -14,7 +14,7 @@ Messages:
 
     Cooldown: "<red>This command is on cooldown."
 
-    CommandHelp: "Correct usage: /$registration $parameters - $description"
+    CommandHelp: "Correct usage: /$command $parameters - $description"
 
     Developer: "<red>You must be a developer to use that command."
 

@@ -102,7 +102,10 @@ public class BukkitCommandLoader implements CommandLoader {
 
     commandInfo.setParent(parent);
 
-    commandInfo.setAliases(CommandsHandler.manager().translate(base + ".Alias", Optional.empty(), config.getStringList(base + ".Alias")));
+    LinkedList<String> alias = new LinkedList<>();
+    alias.addAll(config.getStringList(base + ".Alias"));
+
+    commandInfo.setAliases(CommandsHandler.manager().translate(base + ".Alias", Optional.empty(), alias));
     commandInfo.setAuthor(config.getString(base + ".Author", "Magic"));
     commandInfo.setPermission(config.getString(base + ".Permission", ""));
     commandInfo.setConsole(config.getBoolean(base + ".Console", true));

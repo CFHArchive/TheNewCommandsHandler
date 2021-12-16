@@ -22,7 +22,7 @@ public class BukkitProvider implements ImplementationProvider {
     LinkedList<String> online = new LinkedList<>();
 
     for(Player player : Bukkit.getOnlinePlayers()) {
-      online.add(ChatColor.stripColor(player.getDisplayName()));
+      online.add(ChatColor.stripColor(player.getName()));
     }
     return online;
   }

@@ -108,8 +108,8 @@ public class CommandInformation {
 
     Optional<CommandInformation> sub;
 
-    ////System.out.println("ArgumentList Size: " + argumentsList.size());
-    ////System.out.println("Identifier: " + identifier);
+    ////////System.out.println("ArgumentList Size: " + argumentsList.size());
+    ////////System.out.println("Identifier: " + identifier);
     while(!identifier.equalsIgnoreCase("") && (sub = findSub(identifier)).isPresent()) {
       subInformation.setInformation(sub.get());
 
@@ -127,12 +127,12 @@ public class CommandInformation {
   }
 
   public String getCompleter(int argumentLength) {
-    ////System.out.println("Length: " + argumentLength);
+    ////////System.out.println("Length: " + argumentLength);
     if(parameters.containsKey(argumentLength)) {
-      ////System.out.println("Length: " + argumentLength);
+      ////////System.out.println("Length: " + argumentLength);
       final CommandParameter param = parameters.get(argumentLength);
 
-      ////System.out.println("comp: " + param.getCompleteType());
+      ////////System.out.println("comp: " + param.getCompleteType());
       if(param.isTabComplete()) {
         return param.getCompleteType();
       }
@@ -169,7 +169,7 @@ public class CommandInformation {
       parameter.setOrder(parameters.size());
     }
     if(!parameter.isOptional()) requiredArguments += 1;
-    ////System.out.println("Required Params: " + requiredArguments);
+    ////////System.out.println("Required Params: " + requiredArguments);
     parameters.put(parameter.getOrder(), parameter);
   }
 
@@ -193,17 +193,33 @@ public class CommandInformation {
     this.requiredArguments = requiredArguments;
   }
 
-  public List<String> buildHelp(PlayerProvider sender) {
+  public LinkedList<String> buildHelp(PlayerProvider sender) {
     String help = CommandsHandler.manager().translate("Messages.Command.CommandHelp", Optional.of(sender), MessageSettings.commandHelp);
     help = help.replace("$command", buildCommand(sender));
     help = help.replace("$description", CommandsHandler.manager().translate(description, Optional.of(sender), MessageSettings.commandHelp));
     help = help.replace("$parameters", buildParameters(sender));
+    ////System.out.println("DESC: " + CommandsHandler.manager().translate(description, Optional.of(sender), MessageSettings.commandHelp));
+    ////System.out.println("HELP: " + help);
 
-    return CommandsHandler.manager().translate(help, Optional.of(sender), Collections.singletonList(help));
+    LinkedList<String> helpList = new LinkedList<>();
+
+    StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+
+    //System.out.println("========== STACK ==========");
+    //System.out.println("Help: " + help);
+    //System.out.println("String: " + stackTraceElements[0].toString());
+    //System.out.println("String: " + stackTraceElements[1].toString());
+    //System.out.println("String: " + stackTraceElements[2].toString());
+    //System.out.println("String: " + stackTraceElements[3].toString());
+    //System.out.println("========== END ==========");
+    helpList.add(help);
+    //System.out.println("Help size: " + helpList.size());
+
+    return CommandsHandler.manager().translate(helpList, Optional.of(sender), helpList);
   }
 
-  public LinkedHashSet<String> buildHelpSub(PlayerProvider sender, int page) {
-    LinkedHashSet<String> help = new LinkedHashSet<>();
+  public LinkedList<String> buildHelpSub(PlayerProvider sender, int page) {
+    LinkedList<String> help = new LinkedList<>();
 
     final int linesPerPage = (sender.isPlayer())? CommandsHandler.instance().getHelpLength() : 40;
 
@@ -232,12 +248,23 @@ public class CommandInformation {
       header = header.replace("$command", formatted);
       header = header.replace("$page", Math.max(page, 1) + "");
       header = header.replace("$max", max + "");
+
+      StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+
+      //System.out.println("========== STACK ==========");
+      //System.out.println("Header: " + header);
+      //System.out.println("String: " + stackTraceElements[0].toString());
+      //System.out.println("String: " + stackTraceElements[1].toString());
+      //System.out.println("String: " + stackTraceElements[2].toString());
+      //System.out.println("String: " + stackTraceElements[3].toString());
+      //System.out.println("========== END ==========");
+      
       help.add(header);
     }
 
     if (sub.size() > 0) {
 
-      List<CommandInformation> subInfo = new ArrayList<>(sub.values());
+      LinkedList<CommandInformation> subInfo = new LinkedList<>(sub.values());
 
       while(remaining > 0) {
         if(subInfo.size() <= index) break;
@@ -254,7 +281,7 @@ public class CommandInformation {
     } else {
       help.addAll(buildHelp(sender));
     }
-
+    //System.out.println("Help size: " + help.size());
     return help;
   }
 
@@ -319,6 +346,7 @@ public class CommandInformation {
       final String paramStr = (param.isOptional())? CommandsHandler.manager().translate("Messages.Parameter.ParameterOption", Optional.of(sender), MessageSettings.parameterOption) :
           CommandsHandler.manager().translate("Messages.Parameter.ParameterRequired", Optional.of(sender), MessageSettings.parameterRequired);
       builder.append(paramStr.replace("$parameter", param.getName().toLowerCase()));
+      ////System.out.println("Param: " + paramStr);
     }
     return builder.toString();
   }
